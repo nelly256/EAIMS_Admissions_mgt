@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EAIMS Admissions Frontend</title>
+    <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+    <div class="app-shell">
+        <header class="app-header">
+            <div>
+                <h1>EAIMS Admissions</h1>
+                <p>Admissions management interface for programmes, intakes, students, and admission letters.</p>
+            </div>
+            <nav class="tabs" aria-label="Main navigation">
+                <button class="tab-button active" data-target="dashboard">Dashboard</button>
+                <button class="tab-button" data-target="programmes">Programmes</button>
+                <button class="tab-button" data-target="intakes">Intakes</button>
+                <button class="tab-button" data-target="students">Students</button>
+                <button class="tab-button" data-target="letters">Admission Letters</button>
+            </nav>
+        </header>
+
+        <main class="main-content">
+            <section id="dashboard" class="tab-panel active">
+                <div class="cards-grid">
+                    <article class="card">
+                        <h2 id="course-count">0</h2>
+                        <p>Programmes</p>
+                    </article>
+                    <article class="card">
+                        <h2 id="intake-count">0</h2>
+                        <p>Active Intake</p>
+                    </article>
+                    <article class="card">
+                        <h2 id="student-count">0</h2>
+                        <p>Students</p>
+                    </article>
+                    <article class="card">
+                        <h2 id="letter-count">0</h2>
+                        <p>Admission Letters</p>
+                    </article>
+                </div>
+                <section class="panel">
+                    <h2>Quick Overview</h2>
+                    <p>This frontend is built around the admissions schema. Use the tabs above to manage each data set locally. Integrate with a backend API later for persistence.</p>
+                </section>
+            </section>
+
+            <section id="programmes" class="tab-panel">
+                <div class="panel split">
+                    <div>
+                        <h2>Programmes</h2>
+                        <div class="panel programme-stats">
+                            <div class="programme-charts">
+                                <article class="chart-card">
+                                    <h3>Programme Types</h3>
+                                    <div id="programme-type-chart" class="doughnut-chart" role="img" aria-label="Programme type distribution">
+                                        <div class="doughnut-center">
+                                            <strong id="programme-total">0</strong>
+                                            <span>Total programmes</span>
+                                        </div>
+                                    </div>
+                                    <ul class="chart-legend" aria-label="Programme type totals">
+                                        <li><span class="legend-dot certificate"></span>Certificate <strong id="certificate-count">0</strong></li>
+                                        <li><span class="legend-dot diploma"></span>Diploma <strong id="diploma-count">0</strong></li>
+                                    </ul>
+                                </article>
+                                <article class="chart-card">
+                                    <h3>Applicant Types</h3>
+                                    <div id="applicant-type-chart" class="doughnut-chart" role="img" aria-label="Applicant type distribution">
+                                        <div class="doughnut-center">
+                                            <strong id="total-applicants">0</strong>
+                                            <span>Total applicants</span>
+                                        </div>
+                                    </div>
+                                    <ul class="chart-legend" aria-label="Applicant type totals">
+                                        <li><span class="legend-dot certificate"></span>Certificate <strong id="certificate-applicants">0</strong></li>
+                                        <li><span class="legend-dot diploma"></span>Diploma <strong id="diploma-applicants">0</strong></li>
+                                    </ul>
+                                </article>
+                            </div>
+                        </div>
+                        <form id="course-form" class="entity-form">
+                            <label>
+                                Programme Code
+                                <input type="text" name="course_code" maxlength="10" required />
+                            </label>
+                            <label>
+                                Programme Name
+                                <input type="text" name="course_name" maxlength="150" required />
+                            </label>
+                            <label>
+                                Programme Type
+                                <select name="programme_type" required>
+                                    <option value="">Select type</option>
+                                    <option value="Certificate">Certificate</option>
+                                    <option value="Diploma">Diploma</option>
+                                </select>
+                            </label>
+                            <label>
+                                Capacity
+                                <input type="number" name="capacity_limit" min="1" value="50" />
+                            </label>
+                            <button type="submit" class="primary-button">Add Programme</button>
+                        </form>
+                    </div>
+                    <div class="table-panel">
+                        <div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                                <h3 style="margin: 0;">Diploma Programmes</h3>
+                                <div style="display: flex; gap: 8px;">
+                                    <button class="action-button" onclick="selectAllDiploma()">Select All</button>
+                                    <button class="delete-section-button" onclick="deleteSelectedDiploma()">Delete</button>
+                                </div>
+                            </div>
+                            <div class="table-scroll">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th class="selection-column"><span class="sr-only">Select</span></th>
+                                            <th>#</th>
+                                            <th>Code</th>
+                                            <th>Name</th>
+                                            <th>Capacity</th>
+                                            <th>Applicants</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="diploma-table"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                                <h3 style="margin: 0;">Certificate Programmes</h3>
+                                <div style="display: flex; gap: 8px;">
+                                    <button class="action-button" onclick="selectAllCertificate()">Select All</button>
+                                    <button class="delete-section-button" onclick="deleteSelectedCertificate()">Delete</button>
+                                </div>
+                            </div>
+                            <div class="table-scroll">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th class="selection-column"><span class="sr-only">Select</span></th>
+                                            <th>#</th>
+                                            <th>Code</th>
+                                            <th>Name</th>
+                                            <th>Capacity</th>
+                                            <th>Applicants</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="certificate-table"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="intakes" class="tab-panel">
+                <div class="panel split">
+                    <div>
+                        <h2>Intakes</h2>
+                        <article class="card small-card intake-projection-card" aria-live="polite">
+                            <h3 id="intake-applicant-count">0</h3>
+                            <p id="intake-applicant-label">Students applied for the active intake</p>
+                        </article>
+                        <div id="intake-form" class="entity-form">
+                            <label>
+                                Select active intake
+                                <div class="button-group" role="group" aria-label="Select intake term">
+                                    <button type="button" class="choice-button active" data-intake-name="MARCH">MARCH</button>
+                                    <button type="button" class="choice-button" data-intake-name="AUGUST">AUGUST</button>
+                                </div>
+                            </label>
+                            <p class="hint">Click a term to mark it active. The intake list updates immediately.</p>
+                        </div>
+                    </div>
+                    <div class="table-panel">
+                        <h3>Intake list</h3>
+                        <div class="table-scroll">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Name</th>
+                                        <th>Year</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="intakes-table"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="students" class="tab-panel">
+                <div class="panel split">
+                    <div>
+                        <h2>Students</h2>
+                        <form id="student-form" class="entity-form">
+                            <label>
+                                First Name
+                                <input type="text" name="first_name" maxlength="100" required />
+                            </label>
+                            <label>
+                                Last Name
+                                <input type="text" name="last_name" maxlength="100" required />
+                            </label>
+                            <label>
+                                Address
+                                <input type="text" name="address" maxlength="200" placeholder="City, Region" />
+                            </label>
+                            <label>
+                                Programme Type
+                                <select name="programme_type" required>
+                                    <option value="">Select type</option>
+                                    <option value="Certificate">Certificate</option>
+                                    <option value="Diploma">Diploma</option>
+                                </select>
+                            </label>
+                            <label>
+                                Programme
+                                <select name="course_id" required>
+                                    <option value="">Select programme</option>
+                                </select>
+                            </label>
+                            <button type="submit" class="primary-button">Add Student</button>
+                        </form>
+                    </div>
+                    <div class="table-panel">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                            <h3 style="margin: 0;">Student directory</h3>
+                            <div style="display: flex; gap: 8px;">
+                                <button type="button" class="action-button" onclick="selectAllStudents()">Select All</button>
+                                <button type="button" class="delete-section-button" onclick="deleteSelectedStudents()">Delete</button>
+                            </div>
+                        </div>
+                        <div class="table-scroll">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th class="selection-column"><span class="sr-only">Select</span></th>
+                                        <th>#</th>
+                                        <th>Name</th>
+                                        <th>Programme</th>
+                                        <th>Programme Type</th>
+                                        <th>Address</th>
+                                        <th>Intake</th>
+                                        <th>Joined</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="students-table"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="letters" class="tab-panel">
+                <div class="panel split">
+                    <div>
+                        <h2>Admission Letters</h2>
+                        <form id="letter-form" class="entity-form">
+                            <label>
+                                Student
+                                <select name="student_id" required>
+                                    <option value="">Choose student</option>
+                                </select>
+                            </label>
+                            <label>
+                                Registration Number
+                                <input type="text" name="registration_number" maxlength="50" readonly />
+                            </label>
+                            <label>
+                                Sequence Number
+                                <input type="number" name="sequence_number" min="1" readonly />
+                            </label>
+                            <p class="hint">Sequence number and registration number are generated automatically based on the selected student's intake.</p>
+                            <button type="submit" class="primary-button">Generate Letter</button>
+                        </form>
+                    </div>
+                    <div class="table-panel">
+                        <h3>Admission letters</h3>
+                        <div class="table-scroll">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Student</th>
+                                        <th>Reg. Number</th>
+                                        <th>Sequence</th>
+                                        <th>Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="letters-table"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="app.js" defer></script>
+</body>
+</html>
