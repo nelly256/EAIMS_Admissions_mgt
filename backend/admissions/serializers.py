@@ -22,7 +22,7 @@ class StudentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Student
         fields = [
-            'id', 'first_name', 'last_name', 'address', 'email', 'programme_type',
+            'id', 'full_name', 'address', 'email', 'programme_type',
             'course', 'course_name', 'intake', 'intake_name', 'academic_year',
             'created_at',
         ]
@@ -67,7 +67,7 @@ class AdmissionLetterSerializer(serializers.ModelSerializer):
         read_only_fields = ['generated_date']
 
     def get_student_name(self, obj):
-        return f'{obj.student.first_name} {obj.student.last_name}'
+        return obj.student.full_name
 
     def validate_student(self, student):
         if AdmissionLetter.objects.filter(student=student).exists():

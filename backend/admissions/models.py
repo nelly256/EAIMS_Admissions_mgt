@@ -37,8 +37,7 @@ class Student(models.Model):
         ('Certificate', 'Certificate'),
     ]
 
-    first_name = models.CharField(max_length=100)
-    last_name = models.CharField(max_length=100)
+    full_name = models.CharField(max_length=200)
     address = models.CharField(max_length=300, blank=True, default='')
     email = models.EmailField(max_length=200, blank=True, default='')
     programme_type = models.CharField(max_length=20, choices=PROGRAMME_CHOICES)
@@ -47,7 +46,7 @@ class Student(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f'{self.first_name} {self.last_name}'
+        return self.full_name
 
 
 class AdmissionLetter(models.Model):

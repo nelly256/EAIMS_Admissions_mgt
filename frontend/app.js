@@ -385,7 +385,7 @@ function renderStudents() {
             <tr>
                 <td><input type="checkbox" ${isChecked} onchange="toggleStudentSelection(${student.id})"></td>
                 <td>${index + 1}</td>
-                <td>${student.first_name} ${student.last_name}</td>
+                <td>${student.full_name}</td>
                 <td>${course ? course.course_name : 'N/A'}</td>
                 <td>${student.programme_type || 'N/A'}</td>
                 <td>${student.address ? student.address : 'N/A'}</td>
@@ -404,7 +404,7 @@ function renderLetters() {
             return `
             <tr>
                 <td>${index + 1}</td>
-                <td>${student ? `${student.first_name} ${student.last_name}` : 'Unknown'}</td>
+                <td>${student ? student.full_name : 'Unknown'}</td>
                 <td>${letter.registration_number}</td>
                 <td>${letter.sequence_number}</td>
                 <td>${formatDate(letter.generated_date)}</td>
@@ -434,7 +434,7 @@ function refreshSelects() {
         elements.studentSelect.innerHTML = '<option value="">Choose student</option>' +
             state.students
                 .filter((student) => !state.admissionLetters.some((letter) => letter.student === student.id))
-                .map((student) => `<option value="${student.id}">${student.first_name} ${student.last_name}${student.address ? ' — ' + student.address : ''}</option>`)
+                .map((student) => `<option value="${student.id}">${student.full_name}${student.address ? ' — ' + student.address : ''}</option>`)
                 .join('');
     }
 }
@@ -576,14 +576,13 @@ async function handleCourseSubmit(event) {
 async function handleStudentSubmit(event) {
     event.preventDefault();
     const form = event.target;
-    const firstName = form.first_name.value.trim();
-    const lastName = form.last_name.value.trim();
+    const fullName = form.full_name.value.trim();
     const address = form.address ? form.address.value.trim() : '';
     const email = form.email ? form.email.value.trim() : '';
     const programmeType = form.programme_type.value;
     const courseId = Number(form.course_id.value);
 
-    if (!firstName || !lastName || !programmeType || !courseId) {
+    if (!fullName || !programmeType || !courseId) {
         showAlert('Please complete all student fields.');
         return;
     }
@@ -598,8 +597,7 @@ async function handleStudentSubmit(event) {
         await apiFetch('/students/', {
             method: 'POST',
             body: JSON.stringify({
-                first_name: firstName,
-                last_name: lastName,
+                full_name: fullName,
                 address: address,
                 email: email,
                 programme_type: programmeType,

@@ -16,7 +16,7 @@ class IntakeAdmin(admin.ModelAdmin):
 
 @admin.register(Student)
 class StudentAdmin(admin.ModelAdmin):
-    list_display = ('first_name', 'last_name', 'course', 'intake', 'programme_type', 'created_at')
+    list_display = ('full_name', 'course', 'intake', 'programme_type', 'created_at')
     list_filter = ('programme_type', 'intake', 'course')
 
 
