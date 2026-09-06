@@ -4,7 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>EAIMS Admissions Frontend</title>
-    <link rel="stylesheet" href="styles.css" />
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'styles.css' %}" />
 </head>
 <body>
     <div class="app-shell">
@@ -13,7 +14,8 @@
                 <h1>EAIMS Admissions</h1>
                 <p>Admissions management interface for programmes, intakes, students, and admission letters.</p>
             </div>
-            <nav class="tabs" aria-label="Main navigation">
+            <button id="logout-button" class="logout-button">Logout</button>
+            <nav class="navbar" aria-label="Main navigation">
                 <button class="tab-button active" data-target="dashboard">Dashboard</button>
                 <button class="tab-button" data-target="programmes">Programmes</button>
                 <button class="tab-button" data-target="intakes">Intakes</button>
@@ -25,34 +27,10 @@
         <main class="main-content">
             <section id="dashboard" class="tab-panel active">
                 <div class="cards-grid">
-                    <article class="card">
+                    <article class="card programmes-card">
                         <h2 id="course-count">0</h2>
                         <p>Programmes</p>
-                    </article>
-                    <article class="card">
-                        <h2 id="intake-count">0</h2>
-                        <p>Active Intake</p>
-                    </article>
-                    <article class="card">
-                        <h2 id="student-count">0</h2>
-                        <p>Students</p>
-                    </article>
-                    <article class="card">
-                        <h2 id="letter-count">0</h2>
-                        <p>Admission Letters</p>
-                    </article>
-                </div>
-                <section class="panel">
-                    <h2>Quick Overview</h2>
-                    <p>This frontend is built around the admissions schema. Use the tabs above to manage each data set locally. Integrate with a backend API later for persistence.</p>
-                </section>
-            </section>
-
-            <section id="programmes" class="tab-panel">
-                <div class="panel split">
-                    <div>
-                        <h2>Programmes</h2>
-                        <div class="panel programme-stats">
+                        <div class="programme-stats">
                             <div class="programme-charts">
                                 <article class="chart-card">
                                     <h3>Programme Types</h3>
@@ -82,6 +60,39 @@
                                 </article>
                             </div>
                         </div>
+                    </article>
+                    <article class="card dashboard-stat-card intake-stat-card">
+                        <h2 id="intake-count">0</h2>
+                        <p>Active Intake</p>
+                    </article>
+                    <article class="card dashboard-stat-card">
+                        <h2 id="student-count">0</h2>
+                        <p>Students</p>
+                    </article>
+                    <article class="card dashboard-stat-card">
+                        <h2 id="letter-count">0</h2>
+                        <p>Admission Letters</p>
+                    </article>
+                </div>
+                <section class="panel" id="demographic-insights">
+                    <h2>Demographic & Geographical Insights</h2>
+                    <p style="margin: 0 0 12px; color: #475569; font-size: 0.9rem;">Visualization of applicant origin, background, and program popularity to guide future recruitment efforts.</p>
+                    <div class="insights-grid">
+                        <div class="insight-block">
+                            <h3>Applicant Origin</h3>
+                            <ul id="insights-locations" class="insight-list"></ul>
+                        </div>
+                        <div class="insight-block">
+                            <h3>Programme Popularity</h3>
+                            <ul id="insights-programmes" class="insight-list"></ul>
+                        </div>
+                    </div>
+                </section>
+            </section>
+
+            <section id="programmes" class="tab-panel">
+                <div class="panel split programme-layout">
+                    <div class="left-panel">
                         <form id="course-form" class="entity-form">
                             <label>
                                 Programme Code
@@ -305,6 +316,6 @@
         </main>
     </div>
 
-    <script src="app.js" defer></script>
+    <script src="{% static 'app.js' %}" defer></script>
 </body>
 </html>
