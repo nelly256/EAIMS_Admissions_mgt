@@ -589,7 +589,7 @@ input[type="text"]:focus {
 }
 
 #programmes .table-scroll {
-    max-height: 260px;
+    max-height: 180px;
     overflow-y: auto;
 }
 
