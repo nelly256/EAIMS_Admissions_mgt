@@ -600,6 +600,10 @@ input[type="text"]:focus {
     overflow-y: auto;
 }
 
+#students .panel.split {
+    grid-template-rows: 1fr;
+}
+
 table {
     width: 100%;
     border-collapse: collapse;
