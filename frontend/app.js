@@ -389,6 +389,7 @@ function renderStudents() {
                 <td>${course ? course.course_name : 'N/A'}</td>
                 <td>${student.programme_type || 'N/A'}</td>
                 <td>${student.address ? student.address : 'N/A'}</td>
+                <td>${student.email ? student.email : 'N/A'}</td>
                 <td>${intake ? intake.intake_name : 'N/A'}</td>
                 <td>${formatDate(student.created_at)}</td>
             </tr>`;
@@ -578,6 +579,7 @@ async function handleStudentSubmit(event) {
     const firstName = form.first_name.value.trim();
     const lastName = form.last_name.value.trim();
     const address = form.address ? form.address.value.trim() : '';
+    const email = form.email ? form.email.value.trim() : '';
     const programmeType = form.programme_type.value;
     const courseId = Number(form.course_id.value);
 
@@ -599,6 +601,7 @@ async function handleStudentSubmit(event) {
                 first_name: firstName,
                 last_name: lastName,
                 address: address,
+                email: email,
                 programme_type: programmeType,
                 course: courseId,
                 intake: activeIntake.id,

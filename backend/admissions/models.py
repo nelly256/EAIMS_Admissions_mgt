@@ -40,6 +40,7 @@ class Student(models.Model):
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
     address = models.CharField(max_length=300, blank=True, default='')
+    email = models.EmailField(max_length=200, blank=True, default='')
     programme_type = models.CharField(max_length=20, choices=PROGRAMME_CHOICES)
     course = models.ForeignKey(Course, on_delete=models.PROTECT, related_name='students')
     intake = models.ForeignKey(Intake, on_delete=models.PROTECT, related_name='students')
