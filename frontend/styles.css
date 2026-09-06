@@ -594,18 +594,8 @@ input[type="text"]:focus {
 }
 
 #students .table-scroll {
-    flex: 1 1 auto;
-    min-height: 0;
+    max-height: 320px;
     overflow-y: auto;
-}
-
-#students .panel.split {
-    grid-template-rows: 1fr;
-    height: 100%;
-}
-
-#students .table-panel {
-    height: 100%;
 }
 
 table {
