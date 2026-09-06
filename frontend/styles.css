@@ -594,7 +594,7 @@ input[type="text"]:focus {
 }
 
 #students .table-scroll {
-    max-height: 320px;
+    max-height: calc(100vh - 280px);
     overflow-y: auto;
 }
 
