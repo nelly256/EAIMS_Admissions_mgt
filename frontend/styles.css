@@ -593,6 +593,11 @@ input[type="text"]:focus {
     overflow-y: auto;
 }
 
+#students .table-scroll {
+    max-height: 280px;
+    overflow-y: auto;
+}
+
 table {
     width: 100%;
     border-collapse: collapse;
