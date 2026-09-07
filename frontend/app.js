@@ -776,6 +776,42 @@ async function init() {
     if (logoutButton) {
         logoutButton.addEventListener('click', logout);
     }
+    document.addEventListener('click', handleDocumentClick);
+}
+
+function handleDocumentClick(event) {
+    const dropdown = document.getElementById('export-dropdown');
+    if (dropdown && !dropdown.contains(event.target) && !event.target.closest('.export-dropdown-button')) {
+        dropdown.style.display = 'none';
+    }
+}
+
+function toggleExportDropdown() {
+    const dropdown = document.getElementById('export-dropdown');
+    if (dropdown) {
+        dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+    }
+}
+
+async function exportStudents(format) {
+    const dropdown = document.getElementById('export-dropdown');
+    if (dropdown) {
+        dropdown.style.display = 'none';
+    }
+    try {
+        const token = getToken();
+        const endpoint = format === 'pdf'
+            ? '/api/students/export_pdf/'
+            : '/api/students/export_docx/';
+        const link = document.createElement('a');
+        link.href = `${API_BASE}${endpoint}`;
+        link.target = '_blank';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    } catch (err) {
+        showAlert('Export failed. Please try again.');
+    }
 }
 
 window.addEventListener('DOMContentLoaded', init);

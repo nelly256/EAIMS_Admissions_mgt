@@ -245,10 +245,15 @@
                     <div class="table-panel">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
                             <h3 style="margin: 0;">Student directory</h3>
-                            <div style="display: flex; gap: 8px;">
-                                <button type="button" class="action-button" onclick="selectAllStudents()">Select All</button>
-                                <button type="button" class="delete-section-button" onclick="deleteSelectedStudents()">Delete</button>
-                            </div>
+                             <div style="display: flex; gap: 8px;">
+                                 <button type="button" class="action-button" onclick="selectAllStudents()">Select All</button>
+                                 <button type="button" class="delete-section-button" onclick="deleteSelectedStudents()">Delete</button>
+                                 <button type="button" class="action-button export-dropdown-button" onclick="toggleExportDropdown()">Export</button>
+                                 <div id="export-dropdown" class="export-dropdown" style="display: none;">
+                                     <button type="button" class="dropdown-item" onclick="exportStudents('pdf')">PDF</button>
+                                     <button type="button" class="dropdown-item" onclick="exportStudents('docx')">DOCX</button>
+                                 </div>
+                             </div>
                         </div>
                         <div class="table-scroll">
                             <table>

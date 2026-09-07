@@ -561,6 +561,38 @@ input[type="text"]:focus {
     background: #dc2626;
 }
 
+.export-dropdown {
+    position: absolute;
+    top: 36px;
+    right: 0;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    min-width: 100px;
+    z-index: 10;
+}
+
+.dropdown-item {
+    display: block;
+    width: 100%;
+    padding: 6px 12px;
+    text-align: left;
+    background: none;
+    border: none;
+    font-size: 0.85rem;
+    color: #1e293b;
+    cursor: pointer;
+}
+
+.dropdown-item:hover {
+    background: #f1f5f9;
+}
+
+.action-button.export-dropdown-button {
+    position: relative;
+}
+
 .table-panel {
     background: #ffffff;
     border: 1px solid #e2e8f0;
