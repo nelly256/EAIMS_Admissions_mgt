@@ -12,8 +12,8 @@ from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, 
 from reportlab.lib import colors as rl_colors
 from docx import Document
 from docx.shared import Inches
-from .models import Course, Intake, Student, AdmissionLetter
-from .serializers import CourseSerializer, IntakeSerializer, StudentSerializer, AdmissionLetterSerializer
+from .models import Course, Intake, Student, AdmissionLetter, Notification
+from .serializers import CourseSerializer, IntakeSerializer, StudentSerializer, AdmissionLetterSerializer, NotificationSerializer
 
 
 class CourseViewSet(viewsets.ModelViewSet):
@@ -175,3 +175,26 @@ class AdmissionLetterViewSet(viewsets.ModelViewSet):
         )
         serializer = self.get_serializer(letter)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+class NotificationViewSet(viewsets.ModelViewSet):
+    queryset = Notification.objects.all().order_by('-created_at')
+    serializer_class = NotificationSerializer
+    permission_classes = [IsAuthenticated]
+
+    @action(detail=True, methods=['post'])
+    def mark_read(self, request, pk=None):
+        notification = self.get_object()
+        notification.is_read = True
+        notification.save()
+        return Response({'status': 'marked as read'})
+
+    @action(detail=False, methods=['post'])
+    def mark_all_read(self, request):
+        Notification.objects.filter(is_read=False).update(is_read=True)
+        return Response({'status': 'all notifications marked as read'})
+
+    @action(detail=False, methods=['get'])
+    def unread_count(self, request):
+        count = Notification.objects.filter(is_read=False).count()
+        return Response({'unread_count': count})
