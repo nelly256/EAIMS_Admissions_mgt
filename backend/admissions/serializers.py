@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Course, Intake, Student, AdmissionLetter
+from .models import Course, Intake, Student, AdmissionLetter, Notification
 
 
 class CourseSerializer(serializers.ModelSerializer):
@@ -73,3 +73,39 @@ class AdmissionLetterSerializer(serializers.ModelSerializer):
         if AdmissionLetter.objects.filter(student=student).exists():
             raise serializers.ValidationError('This student already has an admission letter.')
         return student
+
+
+class NotificationSerializer(serializers.ModelSerializer):
+    student_name = serializers.SerializerMethodField()
+    student_programme = serializers.SerializerMethodField()
+    time_since = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Notification
+        fields = [
+            'id', 'recipient_type', 'student', 'student_name', 'student_programme',
+            'message', 'is_read', 'created_at', 'time_since',
+        ]
+        read_only_fields = ['id', 'student', 'student_name', 'student_programme',
+                            'message', 'created_at', 'time_since']
+
+    def get_student_name(self, obj):
+        return obj.student.full_name if obj.student else None
+
+    def get_student_programme(self, obj):
+        if obj.student and obj.student.course:
+            return f'{obj.student.course.course_code} ({obj.student.programme_type})'
+        return None
+
+    def get_time_since(self, obj):
+        from datetime import timedelta
+        diff = obj.created_at
+        from django.utils import timezone
+        delta = timezone.now() - diff
+        if delta < timedelta(minutes=1):
+            return 'just now'
+        if delta < timedelta(hours=1):
+            return f'{int(delta.total_seconds() // 60)}m ago'
+        if delta < timedelta(days=1):
+            return f'{int(delta.total_seconds() // 3600)}h ago'
+        return f'{delta.days}d ago'

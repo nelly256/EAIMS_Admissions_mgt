@@ -5,16 +5,39 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>EAIMS Admissions Frontend</title>
     {% load static %}
-    <link rel="stylesheet" href="{% static 'styles.css' %}?v=9" />
+    <link rel="stylesheet" href="{% static 'styles.css' %}?v=11" />
 </head>
 <body>
     <div class="app-shell">
         <header class="app-header">
-            <div>
-                <h1>EAIMS Admissions</h1>
-                <p>Admissions management interface for programmes, intakes, students, and admission letters.</p>
+            <div class="header-top">
+                <div>
+                    <h1>EAIMS Admissions</h1>
+                    <p>Admissions management interface for programmes, intakes, students, and admission letters.</p>
+                </div>
+                <div class="header-actions">
+                    <button id="logout-button" class="logout-button" aria-label="Logout">
+                        <svg class="logout-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                            <polyline points="16 17 21 12 16 7" />
+                            <line x1="21" y1="12" x2="9" y2="12" />
+                        </svg>
+                    </button>
+                    <div class="notification-container">
+                        <button id="notification-bell" class="notification-bell" aria-label="Notifications">
+                            <span class="bell-icon">🔔</span>
+                            <span id="notification-badge" class="notification-badge" style="display: none;">0</span>
+                        </button>
+                        <div id="notification-dropdown" class="notification-dropdown">
+                            <div class="notification-header">
+                                <h3>Notifications</h3>
+                                <button id="mark-all-read" class="mark-all-read-btn">Mark all read</button>
+                            </div>
+                            <div id="notification-list" class="notification-list"></div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <button id="logout-button" class="logout-button">Logout</button>
             <nav class="navbar" aria-label="Main navigation">
                 <button class="tab-button active" data-target="dashboard">Dashboard</button>
                 <button class="tab-button" data-target="programmes">Programmes</button>
@@ -244,11 +267,22 @@
                     </div>
                     <div class="table-panel">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                            <h3 style="margin: 0;">Student directory</h3>
-                            <div style="display: flex; gap: 8px;">
+                            <div style="display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0;">
+                                <h3 style="margin: 0; flex-shrink: 0;">Student directory</h3>
+                                <input type="search" id="student-search" placeholder="Search students…" class="student-search-input" />
+                            </div>
+                            <div style="display: flex; gap: 8px; flex-shrink: 0;">
                                 <button type="button" class="action-button" onclick="selectAllStudents()">Select All</button>
                                 <button type="button" class="delete-section-button" onclick="deleteSelectedStudents()">Delete</button>
                             </div>
+                        </div>
+                        <div class="student-filters">
+                            <select id="filter-programme-type" class="student-filter-select">
+                                <option value="">All Types</option>
+                                <option value="Diploma">Diploma</option>
+                                <option value="Certificate">Certificate</option>
+                            </select>
+                            <button type="button" id="clear-filters" class="action-button">Clear</button>
                         </div>
                         <div class="table-scroll">
                             <table>
@@ -317,6 +351,6 @@
         </main>
     </div>
 
-    <script src="{% static 'app.js' %}?v=9" defer></script>
+    <script src="{% static 'app.js' %}?v=10" defer></script>
 </body>
 </html>

@@ -4,7 +4,9 @@ const state = {
     courses: [],
     intakes: [],
     students: [],
-    admissionLetters: []
+    admissionLetters: [],
+    notifications: [],
+    lastUnreadCount: 0
 };
 
 const elements = {
@@ -35,7 +37,14 @@ const elements = {
     intakeApplicantCount: document.getElementById('intake-applicant-count'),
     intakeApplicantLabel: document.getElementById('intake-applicant-label'),
     studentCount: document.getElementById('student-count'),
-    letterCount: document.getElementById('letter-count')
+    letterCount: document.getElementById('letter-count'),
+    notificationBadge: document.getElementById('notification-badge'),
+    notificationDropdown: document.getElementById('notification-dropdown'),
+    notificationBell: document.getElementById('notification-bell'),
+    notificationList: document.getElementById('notification-list'),
+    studentSearchInput: document.getElementById('student-search'),
+    studentFilterType: document.getElementById('filter-programme-type'),
+    clearFiltersButton: document.getElementById('clear-filters')
 };
 
 const selectedCourses = { Diploma: new Set(), Certificate: new Set() };
@@ -376,7 +385,40 @@ function renderIntakeProjection() {
 }
 
 function renderStudents() {
-    elements.studentTable.innerHTML = state.students
+    const term = (elements.studentSearchInput?.value || '').trim().toLowerCase();
+    const typeFilter = elements.studentFilterType?.value || '';
+
+    const filtered = state.students.filter((student) => {
+        if (term) {
+            const values = [
+                student.full_name || '',
+                student.email || '',
+            ];
+            if (!values.some((v) => v.toLowerCase().includes(term))) {
+                return false;
+            }
+        }
+
+        if (typeFilter && student.programme_type !== typeFilter) {
+            return false;
+        }
+
+        return true;
+    });
+
+    if (!elements.studentTable) {
+        console.error('Student table element not found');
+        return;
+    }
+
+    console.log('renderStudents:', { total: state.students.length, filtered: filtered.length, term, typeFilter });
+
+    if (filtered.length === 0) {
+        elements.studentTable.innerHTML = '<tr><td colspan="9" style="text-align:center;color:#94a3b8;">No students found</td></tr>';
+        return;
+    }
+
+    elements.studentTable.innerHTML = filtered
         .map((student, index) => {
             const course = state.courses.find((item) => item.id === student.course);
             const intake = state.intakes.find((item) => item.id === student.intake);
@@ -439,10 +481,34 @@ function refreshSelects() {
     }
 }
 
+function populateStudentFilters() {
+    if (elements.studentFilterType) {
+        elements.studentFilterType.innerHTML = `
+            <option value="">All Types</option>
+            <option value="Diploma">Diploma</option>
+            <option value="Certificate">Certificate</option>
+        `;
+    }
+}
+
+function setupStudentFilters() {
+    if (elements.studentFilterType) {
+        elements.studentFilterType.addEventListener('change', () => renderStudents());
+    }
+
+    if (elements.clearFiltersButton) {
+        elements.clearFiltersButton.addEventListener('click', () => {
+            if (elements.studentSearchInput) elements.studentSearchInput.value = '';
+            if (elements.studentFilterType) elements.studentFilterType.value = '';
+            renderStudents();
+        });
+    }
+}
+
 function renderProgrammeStats() {
-    const totalProgrammes = state.courses.length;
     const certificateProgrammes = state.courses.filter((course) => course.programme_type === 'Certificate').length;
     const diplomaProgrammes = state.courses.filter((course) => course.programme_type === 'Diploma').length;
+    const totalProgrammes = certificateProgrammes + diplomaProgrammes;
     const certificateApplicants = state.students.filter((student) => {
         const course = state.courses.find((item) => item.id === student.course);
         return course && course.programme_type === 'Certificate';
@@ -525,15 +591,119 @@ function renderDemographicInsights() {
 }
 
 function render() {
-    renderSummary();
-    renderCourses();
-    renderProgrammeStats();
-    renderDemographicInsights();
-    renderIntakes();
-    renderIntakeProjection();
-    renderStudents();
-    renderLetters();
-    refreshSelects();
+    try { renderSummary(); } catch (e) { console.error('renderSummary error:', e); }
+    try { renderCourses(); } catch (e) { console.error('renderCourses error:', e); }
+    try { renderProgrammeStats(); } catch (e) { console.error('renderProgrammeStats error:', e); }
+    try { renderDemographicInsights(); } catch (e) { console.error('renderDemographicInsights error:', e); }
+    try { renderIntakes(); } catch (e) { console.error('renderIntakes error:', e); }
+    try { renderIntakeProjection(); } catch (e) { console.error('renderIntakeProjection error:', e); }
+    try { renderStudents(); } catch (e) { console.error('renderStudents error:', e); }
+    try { renderLetters(); } catch (e) { console.error('renderLetters error:', e); }
+    try { refreshSelects(); } catch (e) { console.error('refreshSelects error:', e); }
+}
+
+/* ===== Notifications ===== */
+
+async function fetchNotifications() {
+    try {
+        state.notifications = await apiFetch('/notifications/?ordering=-created_at') || [];
+    } catch (err) {
+        if (err.message !== 'Unauthorized') {
+            state.notifications = [];
+        }
+    }
+    renderNotifications();
+    renderNotificationBadge();
+}
+
+function renderNotificationBadge() {
+    const unreadCount = state.notifications.filter((n) => !n.is_read).length;
+
+    if (elements.notificationBadge) {
+        elements.notificationBadge.textContent = unreadCount;
+        elements.notificationBadge.style.display = unreadCount > 0 ? 'inline-flex' : 'none';
+    }
+
+    if (unreadCount > state.lastUnreadCount) {
+        elements.notificationBell?.classList.add('shake');
+        setTimeout(() => elements.notificationBell?.classList.remove('shake'), 600);
+    }
+    state.lastUnreadCount = unreadCount;
+}
+
+function renderNotifications() {
+    if (!elements.notificationList) return;
+
+    if (state.notifications.length === 0) {
+        elements.notificationList.innerHTML = '<div class="notification-empty">No notifications yet</div>';
+        return;
+    }
+
+    elements.notificationList.innerHTML = state.notifications
+        .slice(0, 10)
+        .map((notification) => {
+            const cls = notification.is_read ? '' : 'unread';
+            const time = notification.time_since || formatDate(notification.created_at);
+            return `
+            <div class="notification-item ${cls}" onclick="markNotificationRead(${notification.id})">
+                <p class="notification-message">${escapeHtml(notification.message)}</p>
+                <span class="notification-time">${time}</span>
+            </div>`;
+        })
+        .join('');
+}
+
+function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+async function markNotificationRead(notificationId) {
+    try {
+        await apiFetch(`/notifications/${notificationId}/mark_read/`, { method: 'POST' });
+    } catch (err) {
+        if (err.message !== 'Unauthorized') {
+            // ignore
+        }
+    }
+    await fetchNotifications();
+}
+
+async function markAllNotificationsRead() {
+    try {
+        await apiFetch('/notifications/mark_all_read/', { method: 'POST' });
+    } catch (err) {
+        if (err.message !== 'Unauthorized') {
+            // ignore
+        }
+    }
+    await fetchNotifications();
+}
+
+function setupNotificationBell() {
+    elements.notificationBell?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        elements.notificationDropdown?.classList.toggle('show');
+    });
+
+    document.addEventListener('click', () => {
+        elements.notificationDropdown?.classList.remove('show');
+    });
+
+    const markAllBtn = document.getElementById('mark-all-read');
+    if (markAllBtn) {
+        markAllBtn.addEventListener('click', async (e) => {
+            e.stopPropagation();
+            await markAllNotificationsRead();
+        });
+    }
+}
+
+function startNotificationPolling() {
+    fetchNotifications();
+    setInterval(fetchNotifications, 10000);
 }
 
 function showAlert(message) {
@@ -679,7 +849,14 @@ function setupTabs() {
             panels.forEach((panel) => panel.classList.remove('active'));
 
             button.classList.add('active');
-            document.getElementById(button.dataset.target).classList.add('active');
+            const panel = document.getElementById(button.dataset.target);
+            if (panel) {
+                panel.classList.add('active');
+            }
+
+            if (button.dataset.target === 'students') {
+                renderStudents();
+            }
         });
     });
 }
@@ -754,6 +931,13 @@ async function init() {
 
     setupTabs();
     await refreshData();
+    await fetchNotifications();
+    populateStudentFilters();
+    renderStudents();
+
+    if (elements.studentSearchInput) {
+        elements.studentSearchInput.value = '';
+    }
 
     elements.courseForm.addEventListener('submit', handleCourseSubmit);
     elements.studentForm.addEventListener('submit', handleStudentSubmit);
@@ -770,11 +954,18 @@ async function init() {
         });
     }
     setupIntakeButtons();
+    setupNotificationBell();
+    setupStudentFilters();
     resetIntakeSelection();
+    startNotificationPolling();
 
     const logoutButton = document.getElementById('logout-button');
     if (logoutButton) {
         logoutButton.addEventListener('click', logout);
+    }
+
+    if (elements.studentSearchInput) {
+        elements.studentSearchInput.addEventListener('input', () => renderStudents());
     }
 }
 

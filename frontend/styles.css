@@ -15,7 +15,7 @@ body {
     margin: 0;
     min-height: 100vh;
     background: linear-gradient(180deg, #eef2ff 0%, #f5f7fb 100%);
-    overflow: hidden;
+    overflow-x: hidden;
 }
 
 button,
@@ -36,8 +36,7 @@ select {
 .app-header {
     display: flex;
     flex-direction: column;
-    align-items: stretch;
-    gap: 4px;
+    gap: 8px;
     margin-bottom: 12px;
     padding: 12px 16px;
     background: #ffffff;
@@ -60,21 +59,29 @@ select {
 }
 
 .logout-button {
-    align-self: flex-end;
     border: none;
-    background: #fef2f2;
-    color: #ef4444;
-    padding: 4px 12px;
-    border-radius: 999px;
+    background: transparent;
+    color: #475569;
+    padding: 4px 6px;
+    border-radius: 8px;
     cursor: pointer;
-    font-size: 0.8rem;
-    font-weight: 500;
+    font-size: 1.1rem;
     transition: background 0.2s ease, color 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
 }
 
 .logout-button:hover {
-    background: #fee2e2;
-    color: #dc2626;
+    background: #fef2f2;
+    color: #ef4444;
+}
+
+.logout-icon {
+    width: 18px;
+    height: 18px;
+    stroke: currentColor;
 }
 
 .navbar {
@@ -675,6 +682,210 @@ td {
     color: #991b1b;
 }
 
+/* ===== Notification ===== */
+
+.header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.header-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
+}
+
+.notification-container {
+    position: relative;
+    display: inline-block;
+}
+
+.notification-bell {
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 8px;
+    transition: background 0.2s ease;
+    position: relative;
+    font-size: 1.1rem;
+}
+
+.notification-bell:hover {
+    background: #f1f5f9;
+}
+
+.notification-badge {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    background: #ef4444;
+    color: #ffffff;
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 2px 5px;
+    border-radius: 999px;
+    min-width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.notification-dropdown {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    width: 320px;
+    max-width: calc(100vw - 32px);
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    box-shadow: 0 10px 25px rgba(15, 23, 42, 0.12);
+    z-index: 200;
+    margin-top: 6px;
+}
+
+.notification-dropdown.show {
+    display: block;
+}
+
+.notification-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 14px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.notification-header h3 {
+    margin: 0;
+    font-size: 0.85rem;
+    color: #0f172a;
+}
+
+.mark-all-read-btn {
+    border: none;
+    background: transparent;
+    color: #4f46e5;
+    font-size: 0.75rem;
+    cursor: pointer;
+    padding: 2px 6px;
+    border-radius: 6px;
+}
+
+    .mark-all-read-btn:hover {
+        background: #f1f5f9;
+    }
+
+    @keyframes bell-shake {
+        0%, 100% { transform: rotate(0); }
+        20% { transform: rotate(-15deg); }
+        40% { transform: rotate(10deg); }
+        60% { transform: rotate(-10deg); }
+        80% { transform: rotate(5deg); }
+    }
+
+    .notification-bell.shake {
+        animation: bell-shake 0.6s ease-in-out;
+    }
+
+.notification-list {
+    max-height: 280px;
+    overflow-y: auto;
+}
+
+.notification-item {
+    padding: 10px 14px;
+    border-bottom: 1px solid #f1f5f9;
+    cursor: pointer;
+    transition: background 0.15s ease;
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+}
+
+.notification-item:hover {
+    background: #f8fafc;
+}
+
+.notification-item.unread {
+    background: #f0f4ff;
+    border-left: 3px solid #4f46e5;
+}
+
+.notification-item.unread .notification-message {
+    font-weight: 600;
+}
+
+.notification-time {
+    font-size: 0.68rem;
+    color: #94a3b8;
+    white-space: nowrap;
+    margin-left: auto;
+}
+
+.notification-message {
+    font-size: 0.82rem;
+    color: #1e293b;
+    margin: 0;
+    flex: 1;
+}
+
+.notification-empty {
+    padding: 16px;
+    text-align: center;
+    color: #94a3b8;
+    font-size: 0.82rem;
+}
+
+@media (max-width: 768px) {
+    .notification-dropdown {
+        width: 280px;
+        max-width: calc(100vw - 24px);
+        right: -10px;
+    }
+
+    .notification-bell {
+        font-size: 1rem;
+    }
+
+    .notification-badge {
+        font-size: 0.6rem;
+        min-width: 16px;
+        height: 16px;
+    }
+
+    .notification-header h3 {
+        font-size: 0.8rem;
+    }
+
+    .notification-item {
+        padding: 8px 12px;
+    }
+
+    .notification-message {
+        font-size: 0.76rem;
+    }
+
+    .notification-time {
+        font-size: 0.64rem;
+    }
+
+    .mark-all-read-btn {
+        font-size: 0.7rem;
+    }
+
+    .notification-header {
+        padding: 8px 12px;
+    }
+}
+
 @media (max-width: 980px) {
     .cards-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -841,10 +1052,491 @@ td {
     justify-self: stretch;
 }
 
-.login-hint {
-    text-align: center;
-    margin-top: 18px;
-    margin-bottom: 0;
-    color: #64748b;
-    font-size: 0.85rem;
-}
+    .login-hint {
+        text-align: center;
+        margin-top: 18px;
+        margin-bottom: 0;
+        color: #64748b;
+        font-size: 0.85rem;
+    }
+
+    /* ===== RESPONSIVE BREAKPOINTS ===== */
+
+    /* 1200px+ — desktop wide */
+    @media (min-width: 1200px) {
+        .app-shell {
+            max-width: 1280px;
+            padding: 20px;
+        }
+
+        .app-header {
+            padding: 16px 24px;
+        }
+
+        .app-header h1 {
+            font-size: 1.5rem;
+        }
+
+        .panel {
+            padding: 20px;
+            border-radius: 24px;
+        }
+    }
+
+    /* 980px — transition from desktop to tablet */
+    @media (max-width: 980px) {
+        .cards-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .panel.split {
+            grid-template-columns: 1fr;
+        }
+
+        .intake-stat-card h2 {
+            font-size: 0.95rem;
+        }
+
+        .intake-stat-card p {
+            font-size: 0.7rem;
+        }
+    }
+
+    /* 768px — tablet */
+    @media (max-width: 768px) {
+        .app-shell {
+            padding: 12px;
+        }
+
+        .app-header {
+            padding: 12px 14px;
+        }
+
+        .app-header h1 {
+            font-size: 1.2rem;
+        }
+
+        .app-header p {
+            font-size: 0.78rem;
+            max-width: 100%;
+        }
+
+        .logout-button {
+            padding: 4px 10px;
+            font-size: 0.75rem;
+        }
+
+        .tab-button {
+            padding: 4px 6px;
+            font-size: 0.72rem;
+            gap: 2px;
+        }
+
+        .cards-grid {
+            gap: 6px;
+        }
+
+        .card {
+            padding: 8px;
+            border-radius: 12px;
+        }
+
+        .card h2 {
+            font-size: 1.1rem;
+        }
+
+        .card p {
+            font-size: 0.75rem;
+        }
+
+        .panel {
+            padding: 12px;
+            border-radius: 16px;
+            gap: 12px;
+        }
+
+        #programmes .panel.split {
+            grid-template-columns: 1fr;
+        }
+
+        .dashboard-stat-card h2 {
+            font-size: 1rem;
+        }
+
+        .dashboard-stat-card p {
+            font-size: 0.7rem;
+        }
+
+        .chart-card h3 {
+            font-size: 0.8rem;
+        }
+
+        .doughnut-chart {
+            width: min(130px, 100%);
+        }
+
+        .chart-legend {
+            font-size: 0.65rem;
+        }
+
+        .entity-form label {
+            font-size: 0.82rem;
+        }
+
+        .entity-form input,
+        .entity-form select {
+            font-size: 0.82rem;
+            padding: 7px 9px;
+        }
+
+        th,
+        td {
+            padding: 6px 8px;
+            font-size: 0.75rem;
+        }
+
+        th {
+            font-size: 0.7rem;
+        }
+
+        .button-group {
+            gap: 6px;
+        }
+
+        .choice-button {
+            padding: 8px 10px;
+            font-size: 0.8rem;
+            border-radius: 10px;
+        }
+
+        .primary-button {
+            padding: 8px 12px;
+            font-size: 0.82rem;
+            border-radius: 10px;
+        }
+
+        .delete-button,
+        .delete-section-button,
+        .action-button {
+            font-size: 0.65rem;
+            padding: 2px 5px;
+            border-radius: 6px;
+        }
+
+        .status-badge {
+            font-size: 0.72rem;
+            padding: 5px 8px;
+        }
+
+        .intake-projection-card {
+            padding: 10px;
+        }
+
+        .hint {
+            font-size: 0.82rem;
+        }
+    }
+
+    /* 480px — small mobile / phablet */
+    @media (max-width: 480px) {
+        .app-shell {
+            padding: 8px;
+        }
+
+        .app-header {
+            padding: 8px 10px;
+            border-radius: 12px;
+        }
+
+        .app-header h1 {
+            font-size: 1rem;
+        }
+
+        .app-header p {
+            font-size: 0.72rem;
+        }
+
+        .logout-button {
+            padding: 3px 8px;
+            font-size: 0.7rem;
+        }
+
+        .tab-button {
+            flex: 1 1 auto;
+            min-width: 0;
+            padding: 3px 4px;
+            font-size: 0.68rem;
+        }
+
+        .cards-grid {
+            grid-template-columns: 1fr;
+            gap: 5px;
+        }
+
+        .card {
+            padding: 6px;
+            border-radius: 10px;
+        }
+
+        .card h2 {
+            font-size: 1rem;
+        }
+
+        .card p {
+            font-size: 0.7rem;
+        }
+
+        .panel {
+            padding: 10px;
+            border-radius: 14px;
+        }
+
+        .panel.split {
+            grid-template-columns: 1fr;
+        }
+
+        .programme-stats {
+            padding: 4px 0;
+        }
+
+        .doughnut-chart {
+            width: min(120px, 100%);
+        }
+
+        .doughnut-center {
+            width: 78%;
+        }
+
+        .doughnut-center strong {
+            font-size: 1rem;
+        }
+
+        .doughnut-center span {
+            font-size: 0.6rem;
+        }
+
+        .chart-legend {
+            font-size: 0.6rem;
+        }
+
+        .insight-list li {
+            font-size: 0.72rem;
+            padding: 6px 8px;
+        }
+
+        .insight-block h3 {
+            font-size: 0.8rem;
+        }
+
+        th,
+        td {
+            padding: 5px 6px;
+            font-size: 0.68rem;
+        }
+
+        th {
+            font-size: 0.62rem;
+        }
+
+        .selection-column,
+        .table-panel td:first-child {
+            width: 28px;
+        }
+
+        table {
+            min-width: 100%;
+        }
+
+        th {
+            position: sticky;
+            top: 0;
+            background: #f8fafc;
+            z-index: 5;
+        }
+
+        .table-scroll {
+            max-height: calc(100vh - 220px);
+        }
+
+        .choice-button {
+            padding: 7px 9px;
+            font-size: 0.75rem;
+        }
+
+        .primary-button {
+            padding: 8px 10px;
+            font-size: 0.78rem;
+        }
+
+        .entity-form label {
+            font-size: 0.78rem;
+        }
+
+        .entity-form input,
+        .entity-form select {
+            font-size: 0.78rem;
+            padding: 6px 8px;
+        }
+
+        .hint {
+            font-size: 0.78rem;
+        }
+
+        .status-badge {
+            font-size: 0.65rem;
+            padding: 4px 7px;
+        }
+
+        .login-card {
+            padding: 22px 18px;
+            border-radius: 16px;
+        }
+
+        .login-header h1 {
+            font-size: 1.4rem;
+        }
+
+        .login-header p {
+            font-size: 0.85rem;
+        }
+
+        .login-form {
+            gap: 12px;
+        }
+
+        .login-controls label {
+            font-size: 0.75rem;
+        }
+
+        .login-controls input {
+            padding: 8px 10px;
+            font-size: 0.82rem;
+        }
+
+        .button-group {
+            flex-wrap: wrap;
+        }
+
+        .logout-button {
+            position: relative;
+        }
+
+        .app-header {
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+    }
+
+    /* 360px — very small phones */
+    @media (max-width: 360px) {
+        .card h2 {
+            font-size: 0.9rem;
+        }
+
+        .doughnut-chart {
+            width: min(110px, 100%);
+        }
+
+        .tab-button {
+            font-size: 0.62rem;
+        }
+
+        th,
+        td {
+            font-size: 0.62rem;
+        }
+
+        .choice-button {
+            font-size: 0.7rem;
+            padding: 6px 8px;
+        }
+
+        .primary-button {
+            font-size: 0.72rem;
+            padding: 7px 9px;
+        }
+    }
+
+    .student-search-input {
+        width: 100%;
+        max-width: 220px;
+        padding: 6px 10px;
+        font-size: 0.82rem;
+        border-radius: 8px;
+        border: 1px solid #cbd5e1;
+        background: #f8fafc;
+        color: #0f172a;
+        outline: none;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .student-search-input:focus {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.15);
+    }
+
+    @media (max-width: 768px) {
+        .student-search-input {
+            max-width: 160px;
+            font-size: 0.78rem;
+            padding: 5px 8px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .student-search-input {
+            max-width: 120px;
+            font-size: 0.72rem;
+            padding: 4px 7px;
+        }
+    }
+
+    .student-filters {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-bottom: 10px;
+        align-items: center;
+    }
+
+    .student-filter-select {
+        padding: 5px 8px;
+        font-size: 0.78rem;
+        border-radius: 8px;
+        border: 1px solid #cbd5e1;
+        background: #f8fafc;
+        color: #0f172a;
+        cursor: pointer;
+        outline: none;
+        min-width: 130px;
+    }
+
+    .student-filter-select:focus {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.15);
+    }
+
+    @media (max-width: 768px) {
+        .student-filter-select {
+            font-size: 0.72rem;
+            padding: 4px 7px;
+            min-width: 110px;
+        }
+
+        .student-filters {
+            gap: 6px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .student-filter-select {
+            font-size: 0.68rem;
+            padding: 3px 6px;
+            min-width: 90px;
+        }
+
+        .student-filters {
+            gap: 4px;
+        }
+    }
+
