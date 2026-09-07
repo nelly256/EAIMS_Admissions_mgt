@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>EAIMS Admissions Frontend</title>
     {% load static %}
-    <link rel="stylesheet" href="{% static 'styles.css' %}?v=16" />
+    <link rel="stylesheet" href="{% static 'styles.css' %}?v=17" />
 </head>
 <body>
     <div class="app-shell">
@@ -265,12 +265,9 @@
                             <button type="submit" class="primary-button">Add Student</button>
                         </form>
                     </div>
-                    <div class="table-panel">
+                     <div class="table-panel">
                          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                             <div style="display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0;">
-                                 <h3 style="margin: 0; flex-shrink: 0;">Student directory</h3>
-                                 <input type="search" id="student-search" placeholder="Search students…" class="student-search-input" />
-                             </div>
+                             <h3 style="margin: 0; flex-shrink: 0;">Student directory</h3>
                              <div style="display: flex; gap: 8px; flex-shrink: 0; position: relative;">
                                  <button type="button" class="action-button" onclick="selectAllStudents()">Select All</button>
                                  <button type="button" class="delete-section-button" onclick="deleteSelectedStudents()">Delete</button>
@@ -282,6 +279,7 @@
                              </div>
                          </div>
                         <div class="student-filters">
+                            <input type="search" id="student-search" placeholder="Search students…" class="student-search-input" />
                             <select id="filter-programme-type" class="student-filter-select">
                                 <option value="">All Types</option>
                                 <option value="Diploma">Diploma</option>
