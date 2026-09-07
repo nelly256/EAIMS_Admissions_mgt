@@ -883,7 +883,7 @@ function setupTabs() {
     const panels = document.querySelectorAll('.tab-panel');
 
     tabs.forEach((button) => {
-        button.addEventListener('click', () => {
+        button.addEventListener('click', async () => {
             tabs.forEach((item) => item.classList.remove('active'));
             panels.forEach((panel) => panel.classList.remove('active'));
 
@@ -898,6 +898,7 @@ function setupTabs() {
             }
 
             if (button.dataset.target === 'notifications') {
+                await fetchNotifications();
                 renderNotificationsPage();
             }
         });
