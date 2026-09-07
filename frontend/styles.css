@@ -627,7 +627,10 @@ input[type="text"]:focus {
     min-height: 0;
 }
 
-#programmes .table-scroll {
+#programmes .table-scroll,
+#intakes .table-scroll,
+#letters .table-scroll,
+#demographic-insights .table-scroll {
     max-height: 180px;
     overflow-y: auto;
 }
@@ -639,7 +642,8 @@ input[type="text"]:focus {
 
 table {
     width: 100%;
-    border-collapse: collapse;
+    border-collapse: separate;
+    border-spacing: 0;
     min-width: 520px;
 }
 
@@ -656,6 +660,10 @@ th {
     color: #475569;
     font-size: 0.82rem;
     letter-spacing: 0.02em;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: #f8fafc;
 }
 
 td {
