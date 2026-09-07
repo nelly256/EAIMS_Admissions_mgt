@@ -29,10 +29,10 @@
                             <span id="notification-badge" class="notification-badge" style="display: none;">0</span>
                         </button>
                         <div id="notification-dropdown" class="notification-dropdown">
-                            <div class="notification-header">
-                                <h3>Notifications</h3>
-                                <button id="mark-all-read" class="mark-all-read-btn">Mark all read</button>
-                            </div>
+                                <div class="notification-header">
+                                    <button id="notification-header-link" class="notification-header-link" type="button">Notifications</button>
+                                    <button id="mark-all-read" class="mark-all-read-btn">Mark all read</button>
+                                </div>
                             <div id="notification-list" class="notification-list"></div>
                         </div>
                     </div>
@@ -44,6 +44,7 @@
                 <button class="tab-button" data-target="intakes">Intakes</button>
                 <button class="tab-button" data-target="students">Students</button>
                 <button class="tab-button" data-target="letters">Admission Letters</button>
+                <button class="tab-button" data-target="notifications">Notifications</button>
             </nav>
         </header>
 
@@ -346,6 +347,30 @@
                                     </tr>
                                 </thead>
                                 <tbody id="letters-table"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="notifications" class="tab-panel">
+                <div class="panel split">
+                    <div>
+                        <h2>Notifications</h2>
+                        <p style="margin: 0 0 12px; color: #475569; font-size: 0.9rem;">All notifications for this account.</p>
+                    </div>
+                    <div class="table-panel">
+                        <div class="table-scroll">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Message</th>
+                                        <th>Time</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="notifications-table"></tbody>
                             </table>
                         </div>
                     </div>

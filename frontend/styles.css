@@ -837,6 +837,22 @@ td {
     color: #0f172a;
 }
 
+.notification-header-link {
+    border: none;
+    background: transparent;
+    color: #0f172a;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0;
+    text-align: left;
+}
+
+.notification-header-link:hover {
+    color: #4f46e5;
+    text-decoration: underline;
+}
+
 .mark-all-read-btn {
     border: none;
     background: transparent;

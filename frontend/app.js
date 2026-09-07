@@ -39,6 +39,7 @@ const elements = {
     studentCount: document.getElementById('student-count'),
     letterCount: document.getElementById('letter-count'),
     notificationBadge: document.getElementById('notification-badge'),
+    notificationsTable: document.getElementById('notifications-table'),
     notificationDropdown: document.getElementById('notification-dropdown'),
     notificationBell: document.getElementById('notification-bell'),
     notificationList: document.getElementById('notification-list'),
@@ -655,6 +656,30 @@ function renderNotifications() {
         .join('');
 }
 
+function renderNotificationsPage() {
+    if (!elements.notificationsTable) return;
+
+    if (state.notifications.length === 0) {
+        elements.notificationsTable.innerHTML = '<tr><td colspan="4" style="text-align:center;">No notifications yet</td></tr>';
+        return;
+    }
+
+    elements.notificationsTable.innerHTML = state.notifications
+        .map((notification, index) => {
+            const cls = notification.is_read ? '' : 'unread';
+            const time = notification.time_since || formatDate(notification.created_at);
+            const status = notification.is_read ? 'Read' : 'Unread';
+            return `
+            <tr class="${cls}">
+                <td>${index + 1}</td>
+                <td>${escapeHtml(notification.message)}</td>
+                <td>${escapeHtml(time)}</td>
+                <td>${status}</td>
+            </tr>`;
+        })
+        .join('');
+}
+
 function escapeHtml(text) {
     if (!text) return '';
     const div = document.createElement('div');
@@ -699,6 +724,18 @@ function setupNotificationBell() {
         markAllBtn.addEventListener('click', async (e) => {
             e.stopPropagation();
             await markAllNotificationsRead();
+        });
+    }
+
+    const headerLink = document.getElementById('notification-header-link');
+    if (headerLink) {
+        headerLink.addEventListener('click', (e) => {
+            e.stopPropagation();
+            elements.notificationDropdown?.classList.remove('show');
+            const notificationsTab = document.querySelector('.tab-button[data-target="notifications"]');
+            if (notificationsTab) {
+                notificationsTab.click();
+            }
         });
     }
 }
@@ -858,6 +895,10 @@ function setupTabs() {
 
             if (button.dataset.target === 'students') {
                 renderStudents();
+            }
+
+            if (button.dataset.target === 'notifications') {
+                renderNotificationsPage();
             }
         });
     });
