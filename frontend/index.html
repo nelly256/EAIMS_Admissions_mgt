@@ -10,8 +10,8 @@
 <body>
     <div class="app-shell">
         <header class="app-header">
+            <img class="header-logo" src="{% static 'logo.jpg' %}" alt="EAIMS logo" />
             <div class="header-top">
-                <img class="header-logo" src="{% static 'logo.jpg' %}" alt="EAIMS logo" />
                 <div>
                     <h1>EAIMS Admissions</h1>
                 </div>
@@ -39,6 +39,7 @@
                 </div>
             </div>
             <nav class="navbar" aria-label="Main navigation">
+                <img class="header-logo" src="{% static 'logo.jpg' %}" alt="EAIMS logo" />
                 <button class="tab-button active" data-target="dashboard">Dashboard</button>
                 <button class="tab-button" data-target="programmes">Programmes</button>
                 <button class="tab-button" data-target="intakes">Intakes</button>

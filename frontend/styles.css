@@ -57,7 +57,7 @@ select {
     height: 80px;
     width: auto;
     position: absolute;
-    left: 8px;
+    left: 16px;
     top: 50%;
     transform: translateY(-50%);
 }
@@ -109,6 +109,7 @@ select {
     max-width: 95vw;
     width: 100%;
     justify-content: center;
+    position: relative;
 }
 
 .tab-button {
