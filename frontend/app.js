@@ -40,6 +40,7 @@ const elements = {
     letterCount: document.getElementById('letter-count'),
     notificationBadge: document.getElementById('notification-badge'),
     notificationsTable: document.getElementById('notifications-table'),
+    applicationsTable: document.getElementById('applications-table'),
     notificationDropdown: document.getElementById('notification-dropdown'),
     notificationBell: document.getElementById('notification-bell'),
     notificationList: document.getElementById('notification-list'),
@@ -657,23 +658,26 @@ function renderNotifications() {
 }
 
 function renderNotificationsPage() {
-    if (!elements.notificationsTable) return;
+    if (!elements.applicationsTable) return;
 
-    if (state.notifications.length === 0) {
-        elements.notificationsTable.innerHTML = '<tr><td colspan="4" style="text-align:center;">No notifications yet</td></tr>';
+    if (!state.students.length) {
+        elements.applicationsTable.innerHTML = '<tr><td colspan="8" style="text-align:center;">No applications yet</td></tr>';
         return;
     }
 
-    elements.notificationsTable.innerHTML = state.notifications
-        .map((notification, index) => {
-            const cls = notification.is_read ? '' : 'unread';
-            const time = notification.time_since || formatDate(notification.created_at);
-            const status = notification.is_read ? 'Read' : 'Unread';
+    elements.applicationsTable.innerHTML = state.students
+        .map((student, index) => {
+            const status = student.admission_letters?.length ? 'Admitted' : 'Pending';
+            const cls = status === 'Admitted' ? 'read' : 'unread';
             return `
             <tr class="${cls}">
                 <td>${index + 1}</td>
-                <td>${escapeHtml(notification.message)}</td>
-                <td>${escapeHtml(time)}</td>
+                <td>${escapeHtml(student.full_name)}</td>
+                <td>${escapeHtml(student.course?.course_name || '')}</td>
+                <td>${escapeHtml(student.programme_type)}</td>
+                <td>${escapeHtml(student.intake?.intake_name || '')}</td>
+                <td>${escapeHtml(student.email || '')}</td>
+                <td>${escapeHtml(student.created_at ? formatDate(student.created_at) : '')}</td>
                 <td>${status}</td>
             </tr>`;
         })
@@ -898,8 +902,8 @@ function setupTabs() {
             }
 
             if (button.dataset.target === 'notifications') {
-                await fetchNotifications();
-                renderNotificationsPage();
+                await refreshData();
+                renderApplicationsPage();
             }
         });
     });
