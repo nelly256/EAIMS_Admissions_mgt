@@ -12,4 +12,3 @@ staticfiles/
 Thumbs.db
 *.log
 test_*.py
-seed_data.py
