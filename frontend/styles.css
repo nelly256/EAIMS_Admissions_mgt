@@ -53,12 +53,13 @@ select {
     text-align: center;
 }
 
-.system-logo {
-    height: 40px;
+.header-logo {
+    height: 36px;
     width: auto;
-    display: inline-block;
-    vertical-align: middle;
-    margin-right: 10px;
+    position: absolute;
+    left: 8px;
+    top: 50%;
+    transform: translateY(-50%);
 }
 
 .app-header p {
