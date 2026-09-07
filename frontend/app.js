@@ -966,6 +966,10 @@ async function init() {
         logoutButton.addEventListener('click', logout);
     }
     document.addEventListener('click', handleDocumentClick);
+
+    if (elements.studentSearchInput) {
+        elements.studentSearchInput.addEventListener('input', () => renderStudents());
+    }
 }
 
 function handleDocumentClick(event) {
@@ -1063,11 +1067,6 @@ async function exportStudents(format) {
         if (err.message !== 'Unauthorized') {
             showAlert(err.detail || err.message || 'Export failed. Please try again.');
         }
-    }
-}
-
-    if (elements.studentSearchInput) {
-        elements.studentSearchInput.addEventListener('input', () => renderStudents());
     }
 }
 
