@@ -52,19 +52,24 @@ class StudentViewSet(viewsets.ModelViewSet):
         elements.append(Spacer(1, 12))
         elements.append(Paragraph(f'Generated: {request.user.username}', styles['Normal']))
         elements.append(Spacer(1, 20))
-        data = [['#', 'Name', 'Programme', 'Type', 'Address', 'Email', 'Intake', 'Joined']]
+
+        wrap_style = styles['Normal'].clone('wrap')
+        wrap_style.fontSize = 8
+        wrap_style.leading = 10
+
+        data = [[Paragraph(str(h), styles['Normal']) for h in ['#', 'Name', 'Programme', 'Type', 'Address', 'Email', 'Intake', 'Joined']]]
         for i, student in enumerate(students, 1):
             data.append([
-                str(i),
-                student.full_name,
-                student.course.course_name if student.course else '',
-                student.programme_type,
-                student.address or '',
-                student.email or '',
-                student.intake.intake_name if student.intake else '',
-                student.created_at.strftime('%Y-%m-%d'),
+                Paragraph(str(i), wrap_style),
+                Paragraph(student.full_name, wrap_style),
+                Paragraph(student.course.course_name if student.course else '', wrap_style),
+                Paragraph(student.programme_type, wrap_style),
+                Paragraph(student.address or '', wrap_style),
+                Paragraph(student.email or '', wrap_style),
+                Paragraph(student.intake.intake_name if student.intake else '', wrap_style),
+                Paragraph(student.created_at.strftime('%Y-%m-%d'), wrap_style),
             ])
-        table = Table(data, colWidths=[0.3*inch, 1.2*inch, 1.2*inch, 0.8*inch, 1.0*inch, 1.0*inch, 0.8*inch, 0.6*inch])
+        table = Table(data, colWidths=[0.4*inch, 1.3*inch, 1.3*inch, 0.7*inch, 1.0*inch, 1.1*inch, 0.7*inch, 0.57*inch])
         table.setStyle(TableStyle([
             ('BACKGROUND', (0, 0), (-1, 0), rl_colors.HexColor('#4F46E5')),
             ('TEXTCOLOR', (0, 0), (-1, 0), rl_colors.white),
@@ -74,10 +79,11 @@ class StudentViewSet(viewsets.ModelViewSet):
             ('ROWBACKGROUNDS', (0, 1), (-1, -1), [rl_colors.white, rl_colors.HexColor('#F8FAFC')]),
             ('GRID', (0, 0), (-1, -1), 0.5, rl_colors.HexColor('#E2E8F0')),
             ('VALIGN', (0, 0), (-1, -1), 'TOP'),
-            ('LEFTPADDING', (0, 0), (-1, -1), 3),
-            ('RIGHTPADDING', (0, 0), (-1, -1), 3),
+            ('LEFTPADDING', (0, 0), (-1, -1), 4),
+            ('RIGHTPADDING', (0, 0), (-1, -1), 4),
             ('TOPPADDING', (0, 0), (-1, -1), 4),
             ('BOTTOMPADDING', (0, 0), (-1, -1), 4),
+            ('WORDWRAP', (0, 0), (-1, -1), True),
         ]))
         elements.append(table)
         doc.build(elements)
@@ -93,8 +99,14 @@ class StudentViewSet(viewsets.ModelViewSet):
         doc.add_heading('EAIMS Student Directory', 0)
         table = doc.add_table(rows=1, cols=8)
         table.style = 'Table Grid'
+        table.autofit = False
+        table.allow_autofit = False
+
         header_cells = table.rows[0].cells
         headers = ['#', 'Name', 'Programme', 'Type', 'Address', 'Email', 'Intake', 'Joined']
+        widths = [Inches(0.4), Inches(1.3), Inches(1.3), Inches(0.7), Inches(1.0), Inches(1.1), Inches(0.7), Inches(0.57)]
+        for i, w in enumerate(widths):
+            header_cells[i].width = w
         for i, h in enumerate(headers):
             header_cells[i].text = h
             from docx.oxml.ns import qn
@@ -102,6 +114,7 @@ class StudentViewSet(viewsets.ModelViewSet):
             sh = OxmlElement('w:shd')
             sh.set(qn('w:fill'), '4F4649')
             header_cells[i]._tc.get_or_add_tcPr().append(sh)
+
         for i, student in enumerate(students, 1):
             row = table.add_row().cells
             row[0].text = str(i)
@@ -112,6 +125,9 @@ class StudentViewSet(viewsets.ModelViewSet):
             row[5].text = student.email or ''
             row[6].text = student.intake.intake_name if student.intake else ''
             row[7].text = student.created_at.strftime('%Y-%m-%d')
+            for j, w in enumerate(widths):
+                row[j].width = w
+
         buffer = BytesIO()
         doc.save(buffer)
         buffer.seek(0)

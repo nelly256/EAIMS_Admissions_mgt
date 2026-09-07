@@ -376,11 +376,13 @@ function renderIntakeProjection() {
 }
 
 function renderStudents() {
+    const intakeAbbreviations = { 'MARCH': 'MAR', 'AUGUST': 'AUG' };
     elements.studentTable.innerHTML = state.students
         .map((student, index) => {
             const course = state.courses.find((item) => item.id === student.course);
             const intake = state.intakes.find((item) => item.id === student.intake);
             const isChecked = selectedStudents.has(student.id) ? 'checked' : '';
+            const intakeDisplay = intake ? (intakeAbbreviations[intake.intake_name.toUpperCase()] || intake.intake_name.slice(0, 3).toUpperCase()) : 'N/A';
             return `
             <tr>
                 <td><input type="checkbox" ${isChecked} onchange="toggleStudentSelection(${student.id})"></td>
@@ -390,7 +392,7 @@ function renderStudents() {
                 <td>${student.programme_type || 'N/A'}</td>
                 <td>${student.address ? student.address : 'N/A'}</td>
                 <td>${student.email ? student.email : 'N/A'}</td>
-                <td>${intake ? intake.intake_name : 'N/A'}</td>
+                <td>${intakeDisplay}</td>
                 <td>${formatDate(student.created_at)}</td>
             </tr>`;
         })
