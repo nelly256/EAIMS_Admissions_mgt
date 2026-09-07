@@ -727,13 +727,24 @@ td {
 
 .header-top {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
     flex-wrap: wrap;
     gap: 8px;
+    position: relative;
+    min-height: 40px;
+}
+
+.header-top > div:first-child {
+    text-align: center;
+    flex: 1;
 }
 
 .header-actions {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
     display: inline-flex;
     align-items: center;
     gap: 4px;
