@@ -41,7 +41,7 @@ class StudentViewSet(viewsets.ModelViewSet):
     serializer_class = StudentSerializer
     permission_classes = [IsAuthenticated]
 
-    @action(detail=False, methods=['get'])
+    @action(detail=False, methods=['get'], url_path='export_pdf')
     def export_pdf(self, request):
         students = Student.objects.select_related('course', 'intake').all()
         buffer = BytesIO()
@@ -86,7 +86,7 @@ class StudentViewSet(viewsets.ModelViewSet):
         response['Content-Type'] = 'application/pdf'
         return response
 
-    @action(detail=False, methods=['get'])
+    @action(detail=False, methods=['get'], url_path='export_docx')
     def export_docx(self, request):
         students = Student.objects.select_related('course', 'intake').all()
         doc = Document()

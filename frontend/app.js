@@ -798,19 +798,82 @@ async function exportStudents(format) {
     if (dropdown) {
         dropdown.style.display = 'none';
     }
+
+    const token = getToken();
+    const endpoint = format === 'pdf'
+        ? '/students/export_pdf/'
+        : '/students/export_docx/';
+    const url = `${API_BASE}${endpoint}`;
+
+    console.log('[Export] Requesting', format.toUpperCase(), 'from', url);
+
     try {
-        const token = getToken();
-        const endpoint = format === 'pdf'
-            ? '/api/students/export_pdf/'
-            : '/api/students/export_docx/';
-        const link = document.createElement('a');
-        link.href = `${API_BASE}${endpoint}`;
-        link.target = '_blank';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+        const xhr = new XMLHttpRequest();
+        xhr.open('GET', url, true);
+        if (token) {
+            xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+        }
+        xhr.responseType = 'blob';
+
+        xhr.onload = function () {
+            console.log('[Export] Status:', xhr.status, 'Content-Type:', xhr.getResponseHeader('Content-Type'));
+
+            if (xhr.status === 401) {
+                clearToken();
+                window.location.href = 'login.html';
+                return;
+            }
+
+            if (xhr.status < 200 || xhr.status >= 300) {
+                const errorText = xhr.responseText ? xhr.responseText.slice(0, 200) : 'Unknown error';
+                console.error('[Export] Failed with status', xhr.status, ':', errorText);
+                showAlert(`Export failed (${xhr.status}): ${errorText}`);
+                return;
+            }
+
+            const blob = xhr.response;
+            if (!blob || blob.size === 0) {
+                console.error('[Export] Empty response blob');
+                showAlert('Export failed: empty file received.');
+                return;
+            }
+
+            const disposition = xhr.getResponseHeader('Content-Disposition') || '';
+            const filenameMatch = disposition.match(/filename="?([^"]+)"?/);
+            const fallbackName = format === 'pdf' ? 'students.pdf' : 'students.docx';
+            const filename = filenameMatch && filenameMatch[1] ? filenameMatch[1] : fallbackName;
+
+            console.log('[Export] Downloading file:', filename, 'size:', blob.size, 'bytes');
+
+            const blobUrl = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = blobUrl;
+            link.download = filename;
+            link.style.display = 'none';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            setTimeout(() => window.URL.revokeObjectURL(blobUrl), 1000);
+            console.log('[Export] Download triggered');
+        };
+
+        xhr.onerror = function () {
+            console.error('[Export] Network error while fetching', url);
+            showAlert('Export failed: network error. Check your connection.');
+        };
+
+        xhr.ontimeout = function () {
+            console.error('[Export] Request timed out for', url);
+            showAlert('Export failed: request timed out.');
+        };
+
+        xhr.send();
     } catch (err) {
-        showAlert('Export failed. Please try again.');
+        console.error('[Export] Exception:', err);
+        if (err.message !== 'Unauthorized') {
+            showAlert(err.detail || err.message || 'Export failed. Please try again.');
+        }
     }
 }
 

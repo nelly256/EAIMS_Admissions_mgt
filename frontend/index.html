@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>EAIMS Admissions Frontend</title>
     {% load static %}
-    <link rel="stylesheet" href="{% static 'styles.css' %}?v=9" />
+    <link rel="stylesheet" href="{% static 'styles.css' %}?v=11" />
 </head>
 <body>
     <div class="app-shell">
@@ -244,8 +244,8 @@
                     </div>
                     <div class="table-panel">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                            <h3 style="margin: 0;">Student directory</h3>
-                             <div style="display: flex; gap: 8px;">
+                             <h3 style="margin: 0;">Student directory</h3>
+                              <div style="display: flex; gap: 8px; position: relative;">
                                  <button type="button" class="action-button" onclick="selectAllStudents()">Select All</button>
                                  <button type="button" class="delete-section-button" onclick="deleteSelectedStudents()">Delete</button>
                                  <button type="button" class="action-button export-dropdown-button" onclick="toggleExportDropdown()">Export</button>
@@ -322,6 +322,6 @@
         </main>
     </div>
 
-    <script src="{% static 'app.js' %}?v=9" defer></script>
+    <script src="{% static 'app.js' %}?v=13" defer></script>
 </body>
 </html>
