@@ -327,9 +327,12 @@
                             </label>
                             <label>
                                 Sequence Number
-                                <input type="number" name="sequence_number" min="1" readonly />
+                                <div class="sequence-field">
+                                    <input type="number" name="sequence_number" min="1" />
+                                    <button type="button" class="sequence-reset-button" id="sequence-reset-button" aria-label="Reset sequence number">↻</button>
+                                </div>
                             </label>
-                            <p class="hint">Sequence number and registration number are generated automatically based on the selected student's intake.</p>
+                            <p class="hint">Sequence number and registration number are generated automatically based on the selected student's intake. You can override the sequence number manually if needed.</p>
                             <button type="submit" class="primary-button">Generate Letter</button>
                         </form>
                     </div>

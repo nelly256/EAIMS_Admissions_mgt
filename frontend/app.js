@@ -239,6 +239,34 @@ async function updateLetterSequenceForStudent(studentId) {
     elements.letterForm.registration_number.value = createRegistrationNumberForCourse(course, intake, sequenceNumber);
 }
 
+async function resetSequenceNumber() {
+    const studentId = elements.studentSelect?.value;
+    if (!studentId) {
+        return;
+    }
+    await updateLetterSequenceForStudent(Number(studentId));
+}
+
+function updateRegistrationNumberFromSequence() {
+    const studentId = elements.studentSelect?.value;
+    if (!studentId) {
+        return;
+    }
+    const student = state.students.find((item) => item.id === Number(studentId));
+    if (!student) {
+        return;
+    }
+    const course = state.courses.find((item) => item.id === student.course);
+    if (!course) {
+        return;
+    }
+    const intake = state.intakes.find((item) => item.id === student.intake);
+    const sequenceNumber = Number(elements.letterForm.sequence_number.value);
+    if (sequenceNumber) {
+        elements.letterForm.registration_number.value = createRegistrationNumberForCourse(course, intake, sequenceNumber);
+    }
+}
+
 function formatDate(timestamp) {
     const date = new Date(timestamp);
     return date.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
@@ -1045,6 +1073,17 @@ async function init() {
     if (elements.studentSelect) {
         elements.studentSelect.addEventListener('change', (event) => {
             updateLetterSequenceForStudent(Number(event.target.value));
+        });
+    }
+    const sequenceResetButton = document.getElementById('sequence-reset-button');
+    if (sequenceResetButton) {
+        sequenceResetButton.addEventListener('click', async () => {
+            await resetSequenceNumber();
+        });
+    }
+    if (elements.letterForm.sequence_number) {
+        elements.letterForm.sequence_number.addEventListener('change', () => {
+            updateRegistrationNumberFromSequence();
         });
     }
     if (elements.programmeTypeSelect) {
