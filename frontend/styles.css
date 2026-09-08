@@ -172,7 +172,7 @@ select {
 }
 
 .dashboard-summary-card {
-    grid-column: span 2;
+    grid-column: 3 / 6;
     padding: 10px;
     border-radius: 10px;
 }
