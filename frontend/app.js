@@ -240,15 +240,22 @@ async function updateLetterSequenceForStudent(studentId) {
 }
 
 async function resetSequenceNumber() {
-    const studentId = elements.studentSelect?.value;
+    const studentId = getSelectedStudentId();
     if (!studentId) {
         return;
     }
-    await updateLetterSequenceForStudent(Number(studentId));
+    await updateLetterSequenceForStudent(studentId);
+}
+
+function getSelectedStudentId() {
+    const name = elements.studentSelect?.value?.trim();
+    if (!name) return null;
+    const student = state.students.find((item) => item.full_name === name);
+    return student ? student.id : null;
 }
 
 function updateRegistrationNumberFromSequence() {
-    const studentId = elements.studentSelect?.value;
+    const studentId = getSelectedStudentId();
     if (!studentId) {
         return;
     }
@@ -561,7 +568,7 @@ function refreshSelects() {
         if (datalist) {
             datalist.innerHTML = state.students
                 .filter((student) => !state.admissionLetters.some((letter) => letter.student === student.id))
-                .map((student) => `<option value="${student.id}">${student.full_name}${student.address ? ' — ' + student.address : ''}</option>`)
+                .map((student) => `<option value="${escapeHtml(student.full_name)}">${escapeHtml(student.full_name)}${student.address ? ' — ' + escapeHtml(student.address) : ''}</option>`)
                 .join('');
         }
     }
@@ -909,7 +916,7 @@ async function handleStudentSubmit(event) {
 async function handleLetterSubmit(event) {
     event.preventDefault();
     const form = event.target;
-    const studentId = Number(elements.studentSelect?.value);
+    const studentId = getSelectedStudentId();
     const registrationNumber = form.registration_number.value.trim();
     const sequenceNumber = Number(form.sequence_number.value);
 
@@ -1074,7 +1081,10 @@ async function init() {
     elements.letterForm.addEventListener('submit', handleLetterSubmit);
     if (elements.studentSelect) {
         elements.studentSelect.addEventListener('change', (event) => {
-            updateLetterSequenceForStudent(Number(event.target.value));
+            const studentId = getSelectedStudentId();
+            if (studentId) {
+                updateLetterSequenceForStudent(studentId);
+            }
         });
     }
     const sequenceResetButton = document.getElementById('sequence-reset-button');
