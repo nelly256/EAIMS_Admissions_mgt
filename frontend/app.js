@@ -45,7 +45,10 @@ const elements = {
     notificationList: document.getElementById('notification-list'),
     studentSearchInput: document.getElementById('student-search'),
     studentFilterType: document.getElementById('filter-programme-type'),
-    clearFiltersButton: document.getElementById('clear-filters')
+    clearFiltersButton: document.getElementById('clear-filters'),
+    summaryApplicants: document.getElementById('summary-applicants'),
+    summaryAdmitted: document.getElementById('summary-admitted'),
+    summaryPending: document.getElementById('summary-pending'),
 };
 
 const selectedCourses = { Diploma: new Set(), Certificate: new Set() };
@@ -296,6 +299,22 @@ function renderSummary() {
     elements.intakeCount.textContent = getActiveIntakeNumber();
     elements.studentCount.textContent = state.students.length;
     elements.letterCount.textContent = state.admissionLetters.length;
+    updateSummaryCard();
+}
+
+function updateSummaryCard() {
+    const totalApplicants = state.students.length;
+    const admitted = state.admissionLetters.length;
+    const pending = totalApplicants - admitted;
+    if (elements.summaryApplicants) {
+        elements.summaryApplicants.textContent = totalApplicants;
+    }
+    if (elements.summaryAdmitted) {
+        elements.summaryAdmitted.textContent = admitted;
+    }
+    if (elements.summaryPending) {
+        elements.summaryPending.textContent = pending;
+    }
 }
 
 function toggleCourseSelection(courseId, type) {
