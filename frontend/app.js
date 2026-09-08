@@ -18,7 +18,7 @@ const elements = {
     intakeTable: document.getElementById('intakes-table'),
     studentTable: document.getElementById('students-table'),
     letterTable: document.getElementById('letters-table'),
-    studentSelect: document.querySelector('#letter-form select[name="student_id"]'),
+    studentSelect: document.querySelector('#letter-form #student-search-input'),
     courseSelect: document.querySelector('#student-form select[name="course_id"]'),
     intakeSelect: document.querySelector('#student-form select[name="intake_id"]'),
     programmeTypeSelect: document.querySelector('#student-form select[name="programme_type"]'),
@@ -557,11 +557,13 @@ function refreshSelects() {
     }
 
     if (elements.studentSelect) {
-        elements.studentSelect.innerHTML = '<option value="">Choose student</option>' +
-            state.students
+        const datalist = document.getElementById('student-options');
+        if (datalist) {
+            datalist.innerHTML = state.students
                 .filter((student) => !state.admissionLetters.some((letter) => letter.student === student.id))
                 .map((student) => `<option value="${student.id}">${student.full_name}${student.address ? ' — ' + student.address : ''}</option>`)
                 .join('');
+        }
     }
 }
 
@@ -907,7 +909,7 @@ async function handleStudentSubmit(event) {
 async function handleLetterSubmit(event) {
     event.preventDefault();
     const form = event.target;
-    const studentId = Number(form.student_id.value);
+    const studentId = Number(elements.studentSelect?.value);
     const registrationNumber = form.registration_number.value.trim();
     const sequenceNumber = Number(form.sequence_number.value);
 

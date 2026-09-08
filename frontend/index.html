@@ -317,9 +317,8 @@
                         <form id="letter-form" class="entity-form">
                             <label>
                                 Student
-                                <select name="student_id" required>
-                                    <option value="">Choose student</option>
-                                </select>
+                                <input type="text" id="student-search-input" list="student-options" placeholder="Search student…" autocomplete="off" />
+                                <datalist id="student-options"></datalist>
                             </label>
                             <label>
                                 Registration Number
