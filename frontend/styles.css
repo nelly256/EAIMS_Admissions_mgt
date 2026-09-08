@@ -188,29 +188,30 @@ select {
 }
 
 .dashboard-stat-card {
-    padding: 8px;
+    padding: 6px;
     border-radius: 10px;
 }
 
 .dashboard-stat-card h2 {
-    font-size: 1rem;
+    font-size: 0.95rem;
+    margin: 0 0 2px;
 }
 
 .dashboard-stat-card p {
-    font-size: 0.75rem;
+    font-size: 0.7rem;
 }
 
 .intake-stat-card {
-    padding: 6px;
+    padding: 4px;
     border-radius: 8px;
 }
 
 .intake-stat-card h2 {
-    font-size: 0.95rem;
+    font-size: 0.9rem;
 }
 
 .intake-stat-card p {
-    font-size: 0.7rem;
+    font-size: 0.65rem;
 }
 
 .panel {
@@ -1130,7 +1131,7 @@ td {
 }
 
 .login-background-logo {
-    width: 1000px;
+    width: 800px;
     max-width: 95vw;
     opacity: 0.35;
 }
@@ -1264,11 +1265,11 @@ td {
         }
 
         .intake-stat-card h2 {
-            font-size: 0.95rem;
+            font-size: 0.9rem;
         }
 
         .intake-stat-card p {
-            font-size: 0.7rem;
+            font-size: 0.65rem;
         }
     }
 
@@ -1330,7 +1331,7 @@ td {
         }
 
         .dashboard-stat-card h2 {
-            font-size: 1rem;
+            font-size: 0.95rem;
         }
 
         .dashboard-stat-card p {
