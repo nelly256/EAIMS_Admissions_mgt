@@ -1084,17 +1084,12 @@ async function init() {
     elements.studentForm.addEventListener('submit', handleStudentSubmit);
     elements.letterForm.addEventListener('submit', handleLetterSubmit);
     if (elements.studentSelect) {
-        elements.studentSelect.addEventListener('change', (event) => {
-            const studentId = getSelectedStudentId();
-            if (studentId) {
-                updateLetterSequenceForStudent(studentId);
-            }
-        });
-        elements.studentSelect.addEventListener('input', () => {
+        const handleStudentSearchInput = () => {
             const name = elements.studentSelect.value.trim();
             if (!name) {
                 elements.letterForm.sequence_number.value = '';
                 elements.letterForm.registration_number.value = '';
+                return;
             }
             const cursorPosition = elements.studentSelect.selectionStart;
             elements.studentSelect.value = elements.studentSelect.value
@@ -1102,7 +1097,13 @@ async function init() {
                 .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
                 .join(' ');
             elements.studentSelect.setSelectionRange(cursorPosition, cursorPosition);
-        });
+            const studentId = getSelectedStudentId();
+            if (studentId) {
+                updateLetterSequenceForStudent(studentId);
+            }
+        };
+        elements.studentSelect.addEventListener('input', handleStudentSearchInput);
+        elements.studentSelect.addEventListener('change', handleStudentSearchInput);
     }
     const sequenceResetButton = document.getElementById('sequence-reset-button');
     if (sequenceResetButton) {
