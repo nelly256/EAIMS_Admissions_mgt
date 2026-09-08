@@ -1105,7 +1105,7 @@ async function init() {
         });
     }
     if (elements.letterForm.sequence_number) {
-        elements.letterForm.sequence_number.addEventListener('change', () => {
+        elements.letterForm.sequence_number.addEventListener('input', () => {
             updateRegistrationNumberFromSequence();
         });
     }
