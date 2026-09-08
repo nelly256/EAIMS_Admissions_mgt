@@ -687,6 +687,10 @@ input[type="text"]:focus {
     overflow-y: auto;
 }
 
+#letters .table-scroll {
+    max-height: calc(100vh - 280px);
+}
+
 table {
     width: 100%;
     border-collapse: separate;
