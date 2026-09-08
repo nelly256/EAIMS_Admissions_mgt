@@ -254,7 +254,7 @@ function getSelectedStudentId() {
         elements.letterForm.registration_number.value = '';
         return null;
     }
-    const student = state.students.find((item) => item.full_name === name);
+    const student = state.students.find((item) => item.full_name.toLowerCase() === name.toLowerCase());
     return student ? student.id : null;
 }
 
