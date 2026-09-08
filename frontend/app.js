@@ -1104,6 +1104,7 @@ async function init() {
         };
         elements.studentSelect.addEventListener('input', handleStudentSearchInput);
         elements.studentSelect.addEventListener('change', handleStudentSearchInput);
+        elements.studentSelect.addEventListener('blur', handleStudentSearchInput);
     }
     const sequenceResetButton = document.getElementById('sequence-reset-button');
     if (sequenceResetButton) {
