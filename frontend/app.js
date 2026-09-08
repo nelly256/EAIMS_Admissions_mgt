@@ -1096,6 +1096,12 @@ async function init() {
                 elements.letterForm.sequence_number.value = '';
                 elements.letterForm.registration_number.value = '';
             }
+            const cursorPosition = elements.studentSelect.selectionStart;
+            elements.studentSelect.value = elements.studentSelect.value
+                .split(' ')
+                .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+                .join(' ');
+            elements.studentSelect.setSelectionRange(cursorPosition, cursorPosition);
         });
     }
     const sequenceResetButton = document.getElementById('sequence-reset-button');
