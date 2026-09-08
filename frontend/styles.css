@@ -1112,6 +1112,39 @@ td {
     color: #4338ca;
 }
 
+.login-body {
+    margin: 0;
+    min-height: 100vh;
+    background: #0f172a;
+    color: #ffffff;
+}
+
+.login-background {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.login-background-logo {
+    width: 1000px;
+    max-width: 95vw;
+    opacity: 0.35;
+}
+
+.login-body .app-shell {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+}
+
+.login-body .app-header {
+    display: none;
+}
+
 .login-page {
     display: grid;
     place-items: center;
@@ -1123,12 +1156,15 @@ td {
 .login-card {
     width: 100%;
     max-width: 380px;
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
     border-radius: 20px;
     padding: 28px 24px;
-    box-shadow: 0 16px 40px rgba(15, 23, 42, 0.06);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
     text-align: center;
+    color: #ffffff;
 }
 
 .login-header {
@@ -1143,7 +1179,7 @@ td {
 
 .login-header p {
     margin: 0;
-    color: #475569;
+    color: #cbd5e1;
     font-size: 0.95rem;
 }
 
@@ -1156,22 +1192,29 @@ td {
     display: grid;
     gap: 6px;
     font-size: 0.9rem;
-    color: #334155;
+    color: #e2e8f0;
+    text-align: left;
 }
 
 .login-form input {
     width: 100%;
     padding: 10px 12px;
     border-radius: 10px;
-    border: 1px solid #cbd5e1;
-    background: #f8fafc;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(15, 23, 42, 0.35);
+    color: #ffffff;
     font-size: 0.95rem;
 }
 
 .login-form input:focus {
-    outline: 2px solid #3b82f6;
+    outline: 2px solid #60a5fa;
     outline-offset: 2px;
     border-color: transparent;
+    background: rgba(15, 23, 42, 0.55);
+}
+
+.login-form input::placeholder {
+    color: rgba(255, 255, 255, 0.55);
 }
 
 .login-button {
