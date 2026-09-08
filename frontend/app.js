@@ -249,7 +249,11 @@ async function resetSequenceNumber() {
 
 function getSelectedStudentId() {
     const name = elements.studentSelect?.value?.trim();
-    if (!name) return null;
+    if (!name) {
+        elements.letterForm.sequence_number.value = '';
+        elements.letterForm.registration_number.value = '';
+        return null;
+    }
     const student = state.students.find((item) => item.full_name === name);
     return student ? student.id : null;
 }
@@ -1084,6 +1088,13 @@ async function init() {
             const studentId = getSelectedStudentId();
             if (studentId) {
                 updateLetterSequenceForStudent(studentId);
+            }
+        });
+        elements.studentSelect.addEventListener('input', () => {
+            const name = elements.studentSelect.value.trim();
+            if (!name) {
+                elements.letterForm.sequence_number.value = '';
+                elements.letterForm.registration_number.value = '';
             }
         });
     }
