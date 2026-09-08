@@ -55,19 +55,28 @@ function getToken() {
     return sessionStorage.getItem('eaims_token');
 }
 
+function getRefreshToken() {
+    return sessionStorage.getItem('eaims_refresh_token');
+}
+
 function setToken(token) {
     sessionStorage.setItem('eaims_token', token);
 }
 
+function setRefreshToken(token) {
+    sessionStorage.setItem('eaims_refresh_token', token);
+}
+
 function clearToken() {
     sessionStorage.removeItem('eaims_token');
+    sessionStorage.removeItem('eaims_refresh_token');
 }
 
 function isAuthenticated() {
     return !!getToken();
 }
 
-function apiFetch(url, options = {}) {
+function apiFetch(url, options = {}, retryCount = 0) {
     const defaults = {
         headers: {
             'Content-Type': 'application/json',
@@ -79,7 +88,30 @@ function apiFetch(url, options = {}) {
     }
     return fetch(`${API_BASE}${url}`, { ...defaults, ...options })
         .then(async res => {
-            if (res.status === 401) {
+            if (res.status === 401 && retryCount === 0) {
+                const refreshed = await tryRefreshToken();
+                if (refreshed) {
+                    const newToken = getToken();
+                    defaults.headers['Authorization'] = `Bearer ${newToken}`;
+                    const retryRes = await fetch(`${API_BASE}${url}`, { ...defaults, ...options });
+                    if (retryRes.status === 401) {
+                        clearToken();
+                        window.location.href = 'login.html';
+                        throw new Error('Unauthorized');
+                    }
+                    const contentType = retryRes.headers.get('content-type') || '';
+                    if (contentType.includes('application/json')) {
+                        const data = await retryRes.json().catch(() => null);
+                        if (!retryRes.ok && data) {
+                            throw { __apiError: true, detail: data.detail || data };
+                        }
+                        return data;
+                    }
+                    if (!retryRes.ok) {
+                        throw { __apiError: true, detail: 'Request failed' };
+                    }
+                    return null;
+                }
                 clearToken();
                 window.location.href = 'login.html';
                 throw new Error('Unauthorized');
@@ -97,6 +129,27 @@ function apiFetch(url, options = {}) {
             }
             return null;
         });
+}
+
+async function tryRefreshToken() {
+    const refreshToken = getRefreshToken();
+    if (!refreshToken) return false;
+    try {
+        const res = await fetch(`${API_BASE}/auth/token/refresh/`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ refresh: refreshToken }),
+        });
+        if (!res.ok) return false;
+        const data = await res.json();
+        setToken(data.access);
+        if (data.refresh) {
+            setRefreshToken(data.refresh);
+        }
+        return true;
+    } catch (err) {
+        return false;
+    }
 }
 
 async function refreshData() {
@@ -938,6 +991,9 @@ async function handleLogin(event) {
 
         const data = await res.json();
         setToken(data.access);
+        if (data.refresh) {
+            setRefreshToken(data.refresh);
+        }
         window.location.href = '/';
     } catch (err) {
         showAlert('Login failed. Please try again.');
