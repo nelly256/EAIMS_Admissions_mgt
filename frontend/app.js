@@ -1111,9 +1111,9 @@ async function init() {
         });
     }
     if (elements.letterForm.sequence_number) {
-        elements.letterForm.sequence_number.addEventListener('input', () => {
-            updateRegistrationNumberFromSequence();
-        });
+        const updateRegFromSeq = () => updateRegistrationNumberFromSequence();
+        elements.letterForm.sequence_number.addEventListener('input', updateRegFromSeq);
+        elements.letterForm.sequence_number.addEventListener('change', updateRegFromSeq);
     }
     if (elements.programmeTypeSelect) {
         elements.programmeTypeSelect.addEventListener('change', () => {
