@@ -188,7 +188,7 @@ select {
 }
 
 .dashboard-stat-card {
-    height: 120px;
+    height: 80px;
     padding: 6px;
     border-radius: 10px;
     display: flex;
@@ -208,7 +208,7 @@ select {
 }
 
 .intake-stat-card {
-    height: 120px;
+    height: 80px;
     padding: 4px;
     border-radius: 8px;
     display: flex;
