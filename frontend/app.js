@@ -568,7 +568,7 @@ function refreshSelects() {
         if (datalist) {
             datalist.innerHTML = state.students
                 .filter((student) => !state.admissionLetters.some((letter) => letter.student === student.id))
-                .map((student) => `<option value="${escapeHtml(student.full_name)}">${escapeHtml(student.full_name)}${student.address ? ', ' + escapeHtml(student.address) : ''}</option>`)
+                .map((student) => `<option value="${escapeHtml(student.full_name)}">${student.address ? escapeHtml(student.address) : ''}</option>`)
                 .join('');
         }
     }
