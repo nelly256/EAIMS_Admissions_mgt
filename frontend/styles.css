@@ -178,6 +178,7 @@ select {
 
 .dashboard-overview-card {
     grid-column: 3 / 6;
+    grid-row: 2;
     padding: 12px;
     border-radius: 10px;
 }
