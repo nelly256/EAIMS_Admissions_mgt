@@ -46,6 +46,10 @@ const elements = {
     studentSearchInput: document.getElementById('student-search'),
     studentFilterType: document.getElementById('filter-programme-type'),
     clearFiltersButton: document.getElementById('clear-filters'),
+    overviewTotal: document.getElementById('overview-total'),
+    overviewAdmitted: document.getElementById('overview-admitted'),
+    overviewProgress: document.getElementById('overview-progress'),
+    overviewHint: document.getElementById('overview-hint'),
 };
 
 const selectedCourses = { Diploma: new Set(), Certificate: new Set() };
@@ -296,6 +300,27 @@ function renderSummary() {
     elements.intakeCount.textContent = getActiveIntakeNumber();
     elements.studentCount.textContent = state.students.length;
     elements.letterCount.textContent = state.admissionLetters.length;
+    updateOverviewCard();
+}
+
+function updateOverviewCard() {
+    const total = state.students.length;
+    const admitted = state.admissionLetters.length;
+    const pending = total - admitted;
+    const percentage = total > 0 ? Math.round((admitted / total) * 100) : 0;
+
+    if (elements.overviewTotal) {
+        elements.overviewTotal.textContent = total;
+    }
+    if (elements.overviewAdmitted) {
+        elements.overviewAdmitted.textContent = admitted;
+    }
+    if (elements.overviewProgress) {
+        elements.overviewProgress.style.width = `${percentage}%`;
+    }
+    if (elements.overviewHint) {
+        elements.overviewHint.textContent = `${percentage}% of applicants admitted`;
+    }
 }
 
 function toggleCourseSelection(courseId, type) {
