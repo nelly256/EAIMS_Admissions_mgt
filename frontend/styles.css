@@ -155,8 +155,19 @@ select {
 .cards-grid {
     display: grid;
     gap: 10px;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
+    grid-template-columns: 2fr 3fr;
     margin-bottom: 14px;
+    align-items: start;
+}
+
+.right-stat-cards {
+    display: grid;
+    gap: 10px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.right-stat-cards .dashboard-overview-card {
+    grid-column: span 3;
 }
 
 .card {
@@ -168,7 +179,6 @@ select {
 }
 
 .programmes-card {
-    grid-column: span 2;
 }
 
 .programmes-card > h2:first-child,
@@ -177,10 +187,11 @@ select {
 }
 
 .dashboard-overview-card {
-    grid-column: 3 / 6;
-    grid-row: 2;
+    max-width: calc((100% - 20px) * 0.6);
+    margin-left: auto;
     padding: 12px;
     border-radius: 10px;
+    margin-top: 10px;
 }
 
 .dashboard-overview-card h3 {
@@ -1085,10 +1096,14 @@ td {
 
 @media (max-width: 980px) {
     .cards-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .right-stat-cards {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
-    .dashboard-overview-card {
+    .right-stat-cards .dashboard-overview-card {
         grid-column: span 2;
     }
 
@@ -1115,6 +1130,14 @@ td {
 
     #dashboard .programme-charts {
         grid-template-columns: 1fr;
+    }
+
+    .right-stat-cards {
+        grid-template-columns: 1fr;
+    }
+
+    .right-stat-cards .dashboard-overview-card {
+        grid-column: span 1;
     }
 }
 
@@ -1330,10 +1353,14 @@ td {
     /* 980px — transition from desktop to tablet */
     @media (max-width: 980px) {
         .cards-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .right-stat-cards {
             grid-template-columns: repeat(2, minmax(0, 1fr));
         }
 
-        .dashboard-overview-card {
+        .right-stat-cards .dashboard-overview-card {
             grid-column: span 2;
         }
 
