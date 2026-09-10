@@ -399,6 +399,20 @@
         </main>
     </div>
 
+    <div id="notification-modal" class="notification-modal">
+        <div class="notification-modal-content">
+            <div class="notification-modal-header">
+                <h3>Notification Details</h3>
+                <button id="notification-modal-close" class="notification-modal-close" aria-label="Close">&times;</button>
+            </div>
+            <div class="notification-modal-body">
+                <p id="notification-modal-message"></p>
+                <p id="notification-modal-time" class="notification-modal-meta"></p>
+                <p id="notification-modal-status" class="notification-modal-meta"></p>
+            </div>
+        </div>
+    </div>
+
     <script src="{% static 'app.js' %}?v=15" defer></script>
 </body>
 </html>

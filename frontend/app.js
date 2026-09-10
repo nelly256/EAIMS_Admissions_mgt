@@ -789,7 +789,7 @@ function renderNotificationsPage() {
             const time = notification.time_since || formatDate(notification.created_at);
             const status = notification.is_read ? 'Read' : 'Unread';
             return `
-            <tr class="${cls}">
+            <tr class="${cls}" data-notification-id="${notification.id}" style="cursor: pointer;">
                 <td>${index + 1}</td>
                 <td>${escapeHtml(notification.message)}</td>
                 <td>${escapeHtml(time)}</td>
@@ -797,6 +797,38 @@ function renderNotificationsPage() {
             </tr>`;
         })
         .join('');
+
+    elements.notificationsTable.querySelectorAll('tr[data-notification-id]').forEach((row) => {
+        row.addEventListener('click', () => {
+            const notificationId = Number(row.dataset.notificationId);
+            const notification = state.notifications.find((item) => item.id === notificationId);
+            if (notification) {
+                openNotificationModal(notification);
+            }
+        });
+    });
+}
+
+function openNotificationModal(notification) {
+    const modal = document.getElementById('notification-modal');
+    const messageEl = document.getElementById('notification-modal-message');
+    const timeEl = document.getElementById('notification-modal-time');
+    const statusEl = document.getElementById('notification-modal-status');
+
+    if (!modal || !messageEl || !timeEl || !statusEl) return;
+
+    messageEl.textContent = notification.message || '';
+    timeEl.textContent = 'Time: ' + (notification.time_since || formatDate(notification.created_at) || '');
+    statusEl.textContent = 'Status: ' + (notification.is_read ? 'Read' : 'Unread');
+
+    modal.classList.add('show');
+}
+
+function closeNotificationModal() {
+    const modal = document.getElementById('notification-modal');
+    if (modal) {
+        modal.classList.remove('show');
+    }
 }
 
 function escapeHtml(text) {
@@ -1159,6 +1191,11 @@ async function init() {
         logoutButton.addEventListener('click', logout);
     }
     document.addEventListener('click', handleDocumentClick);
+
+    const modalCloseButton = document.getElementById('notification-modal-close');
+    if (modalCloseButton) {
+        modalCloseButton.addEventListener('click', closeNotificationModal);
+    }
 
     if (elements.studentSearchInput) {
         elements.studentSearchInput.addEventListener('input', () => renderStudents());

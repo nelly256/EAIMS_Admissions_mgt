@@ -800,6 +800,15 @@ td {
     font-size: 0.85rem;
 }
 
+#notifications tbody tr {
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+#notifications tbody tr:hover {
+    background: #f8fafc;
+}
+
 th {
     color: #475569;
     font-size: 0.82rem;
@@ -1053,6 +1062,73 @@ td {
     text-align: center;
     color: #94a3b8;
     font-size: 0.82rem;
+}
+
+.notification-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.45);
+    z-index: 400;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+}
+
+.notification-modal.show {
+    display: flex;
+}
+
+.notification-modal-content {
+    background: #ffffff;
+    border-radius: 16px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 20px 50px rgba(15, 23, 42, 0.25);
+    width: 100%;
+    max-width: 480px;
+    overflow: hidden;
+}
+
+.notification-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.notification-modal-header h3 {
+    margin: 0;
+    font-size: 1rem;
+}
+
+.notification-modal-close {
+    border: none;
+    background: transparent;
+    font-size: 1.4rem;
+    line-height: 1;
+    cursor: pointer;
+    color: #475569;
+    padding: 0 2px;
+}
+
+.notification-modal-close:hover {
+    color: #0f172a;
+}
+
+.notification-modal-body {
+    padding: 16px;
+    display: grid;
+    gap: 10px;
+}
+
+.notification-modal-body p {
+    margin: 0;
+}
+
+.notification-modal-meta {
+    font-size: 0.82rem;
+    color: #475569;
 }
 
 @media (max-width: 768px) {
