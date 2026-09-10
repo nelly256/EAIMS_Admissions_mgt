@@ -50,10 +50,21 @@ class Student(models.Model):
 
 
 class AdmissionLetter(models.Model):
+    STATUS_CHOICES = [
+        ('not_generated', 'Not Generated'),
+        ('generated', 'Generated'),
+        ('sent', 'Sent'),
+        ('failed', 'Failed'),
+    ]
+
     student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='admission_letters')
     registration_number = models.CharField(max_length=100, unique=True)
     sequence_number = models.PositiveIntegerField()
     generated_date = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='not_generated')
+    sent_date = models.DateTimeField(null=True, blank=True)
+    recipient_email = models.EmailField(max_length=200, blank=True, default='')
+    sent_count = models.PositiveIntegerField(default=0)
 
     def __str__(self):
         return self.registration_number
