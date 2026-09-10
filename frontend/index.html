@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>EAIMS Admissions Frontend</title>
     {% load static %}
-    <link rel="stylesheet" href="{% static 'styles.css' %}?v=23" />
+    <link rel="stylesheet" href="{% static 'styles.css' %}?v=29" />
 </head>
 <body>
     <div class="app-shell">
@@ -85,18 +85,37 @@
                             </div>
                         </div>
                     </article>
-                    <article class="card dashboard-stat-card intake-stat-card">
-                        <h2 id="intake-count">0</h2>
-                        <p>Active Intake</p>
-                    </article>
-                    <article class="card dashboard-stat-card">
-                        <h2 id="student-count">0</h2>
-                        <p>Students</p>
-                    </article>
-                    <article class="card dashboard-stat-card">
-                        <h2 id="letter-count">0</h2>
-                        <p>Admission Letters</p>
-                    </article>
+                    <div class="right-stat-cards">
+                        <article class="card dashboard-stat-card intake-stat-card">
+                            <h2 id="intake-count">0</h2>
+                            <p>Active Intake</p>
+                        </article>
+                        <article class="card dashboard-stat-card">
+                            <h2 id="student-count">0</h2>
+                            <p>Students</p>
+                        </article>
+                        <article class="card dashboard-stat-card">
+                            <h2 id="letter-count">0</h2>
+                            <p>Admission Letters</p>
+                        </article>
+                        <article class="card dashboard-overview-card">
+                            <h3>Admission Overview</h3>
+                            <div class="overview-content">
+                                <div class="overview-item">
+                                    <span class="overview-label">Total Applicants</span>
+                                    <span class="overview-value" id="overview-total">0</span>
+                                </div>
+                                <div class="overview-item">
+                                    <span class="overview-label">Admitted</span>
+                                    <span class="overview-value" id="overview-admitted">0</span>
+                                </div>
+                                <div class="overview-progress">
+                                    <div class="overview-progress-bar" id="overview-progress" style="width: 0%;"></div>
+                                </div>
+                                <p class="overview-hint" id="overview-hint">0% of applicants admitted</p>
+                            </div>
+                        </article>
+                    </div>
                 </div>
                 <section class="panel" id="demographic-insights">
                     <h2>Demographic & Geographical Insights</h2>
@@ -317,19 +336,20 @@
                         <form id="letter-form" class="entity-form">
                             <label>
                                 Student
-                                <select name="student_id" required>
-                                    <option value="">Choose student</option>
-                                </select>
+                                <input type="text" id="student-search-input" list="student-options" placeholder="Search student…" autocomplete="off" />
+                                <datalist id="student-options"></datalist>
+                                <input type="hidden" name="student_id" id="student-id-hidden" />
                             </label>
                             <label>
                                 Registration Number
                                 <input type="text" name="registration_number" maxlength="50" readonly />
                             </label>
-                            <label>
-                                Sequence Number
-                                <input type="number" name="sequence_number" min="1" readonly />
-                            </label>
-                            <p class="hint">Sequence number and registration number are generated automatically based on the selected student's intake.</p>
+                            <label for="sequence_number">Sequence Number</label>
+                            <div class="sequence-field">
+                                <input type="number" id="sequence_number" name="sequence_number" min="1" />
+                                <button type="button" class="sequence-reset-button" id="sequence-reset-button" aria-label="Reset sequence number">↻</button>
+                            </div>
+                            <p class="hint">Sequence number and registration number are generated automatically based on the selected student's intake. You can override the sequence number manually if needed.</p>
                             <button type="submit" class="primary-button">Generate Letter</button>
                         </form>
                     </div>
@@ -401,6 +421,20 @@
         </div>
     </div>
 
+    <div id="notification-modal" class="notification-modal">
+        <div class="notification-modal-content">
+            <div class="notification-modal-header">
+                <h3>Notification Details</h3>
+                <button id="notification-modal-close" class="notification-modal-close" aria-label="Close">&times;</button>
+            </div>
+            <div class="notification-modal-body">
+                <p id="notification-modal-message"></p>
+                <p id="notification-modal-time" class="notification-modal-meta"></p>
+                <p id="notification-modal-status" class="notification-modal-meta"></p>
+            </div>
+        </div>
+    </div>
+
     <!-- Email Confirmation Modal -->
     <div id="email-confirm-modal" class="modal-overlay" style="display: none;">
         <div class="modal-container email-modal">
@@ -423,6 +457,6 @@
         </div>
     </div>
 
-    <script src="{% static 'app.js' %}?v=23" defer></script>
+    <script src="{% static 'app.js' %}?v=29" defer></script>
 </body>
 </html>

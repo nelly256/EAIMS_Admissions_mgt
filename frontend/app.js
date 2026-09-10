@@ -18,7 +18,7 @@ const elements = {
     intakeTable: document.getElementById('intakes-table'),
     studentTable: document.getElementById('students-table'),
     letterTable: document.getElementById('letters-table'),
-    studentSelect: document.querySelector('#letter-form select[name="student_id"]'),
+    studentSelect: document.querySelector('#letter-form #student-search-input'),
     courseSelect: document.querySelector('#student-form select[name="course_id"]'),
     intakeSelect: document.querySelector('#student-form select[name="intake_id"]'),
     programmeTypeSelect: document.querySelector('#student-form select[name="programme_type"]'),
@@ -62,6 +62,10 @@ const elements = {
     emailConfirmTo: document.getElementById('email-confirm-to'),
     emailConfirmSubject: document.getElementById('email-confirm-subject'),
     emailConfirmMessage: document.getElementById('email-confirm-message'),
+    overviewTotal: document.getElementById('overview-total'),
+    overviewAdmitted: document.getElementById('overview-admitted'),
+    overviewProgress: document.getElementById('overview-progress'),
+    overviewHint: document.getElementById('overview-hint'),
 };
 
 const selectedCourses = { Diploma: new Set(), Certificate: new Set() };
@@ -71,19 +75,28 @@ function getToken() {
     return sessionStorage.getItem('eaims_token');
 }
 
+function getRefreshToken() {
+    return sessionStorage.getItem('eaims_refresh_token');
+}
+
 function setToken(token) {
     sessionStorage.setItem('eaims_token', token);
 }
 
+function setRefreshToken(token) {
+    sessionStorage.setItem('eaims_refresh_token', token);
+}
+
 function clearToken() {
     sessionStorage.removeItem('eaims_token');
+    sessionStorage.removeItem('eaims_refresh_token');
 }
 
 function isAuthenticated() {
     return !!getToken();
 }
 
-function apiFetch(url, options = {}) {
+function apiFetch(url, options = {}, retryCount = 0) {
     const defaults = {
         headers: {
             'Content-Type': 'application/json',
@@ -95,7 +108,30 @@ function apiFetch(url, options = {}) {
     }
     return fetch(`${API_BASE}${url}`, { ...defaults, ...options })
         .then(async res => {
-            if (res.status === 401) {
+            if (res.status === 401 && retryCount === 0) {
+                const refreshed = await tryRefreshToken();
+                if (refreshed) {
+                    const newToken = getToken();
+                    defaults.headers['Authorization'] = `Bearer ${newToken}`;
+                    const retryRes = await fetch(`${API_BASE}${url}`, { ...defaults, ...options });
+                    if (retryRes.status === 401) {
+                        clearToken();
+                        window.location.href = 'login.html';
+                        throw new Error('Unauthorized');
+                    }
+                    const contentType = retryRes.headers.get('content-type') || '';
+                    if (contentType.includes('application/json')) {
+                        const data = await retryRes.json().catch(() => null);
+                        if (!retryRes.ok && data) {
+                            throw { __apiError: true, detail: data.detail || data };
+                        }
+                        return data;
+                    }
+                    if (!retryRes.ok) {
+                        throw { __apiError: true, detail: 'Request failed' };
+                    }
+                    return null;
+                }
                 clearToken();
                 window.location.href = 'login.html';
                 throw new Error('Unauthorized');
@@ -113,6 +149,27 @@ function apiFetch(url, options = {}) {
             }
             return null;
         });
+}
+
+async function tryRefreshToken() {
+    const refreshToken = getRefreshToken();
+    if (!refreshToken) return false;
+    try {
+        const res = await fetch(`${API_BASE}/auth/token/refresh/`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ refresh: refreshToken }),
+        });
+        if (!res.ok) return false;
+        const data = await res.json();
+        setToken(data.access);
+        if (data.refresh) {
+            setRefreshToken(data.refresh);
+        }
+        return true;
+    } catch (err) {
+        return false;
+    }
 }
 
 async function refreshData() {
@@ -202,6 +259,45 @@ async function updateLetterSequenceForStudent(studentId) {
     elements.letterForm.registration_number.value = createRegistrationNumberForCourse(course, intake, sequenceNumber);
 }
 
+async function resetSequenceNumber() {
+    const studentId = getSelectedStudentId();
+    if (!studentId) {
+        return;
+    }
+    await updateLetterSequenceForStudent(studentId);
+}
+
+function getSelectedStudentId() {
+    const name = elements.studentSelect?.value?.trim();
+    if (!name) {
+        elements.letterForm.sequence_number.value = '';
+        elements.letterForm.registration_number.value = '';
+        return null;
+    }
+    const student = state.students.find((item) => item.full_name.toLowerCase() === name.toLowerCase());
+    return student ? student.id : null;
+}
+
+function updateRegistrationNumberFromSequence() {
+    const studentId = getSelectedStudentId();
+    if (!studentId) {
+        return;
+    }
+    const student = state.students.find((item) => item.id === Number(studentId));
+    if (!student) {
+        return;
+    }
+    const course = state.courses.find((item) => item.id === student.course);
+    if (!course) {
+        return;
+    }
+    const intake = state.intakes.find((item) => item.id === student.intake);
+    const sequenceNumber = Number(elements.letterForm.sequence_number.value);
+    if (sequenceNumber) {
+        elements.letterForm.registration_number.value = createRegistrationNumberForCourse(course, intake, sequenceNumber);
+    }
+}
+
 function formatDate(timestamp) {
     const date = new Date(timestamp);
     return date.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
@@ -220,6 +316,27 @@ function renderSummary() {
     elements.intakeCount.textContent = getActiveIntakeNumber();
     elements.studentCount.textContent = state.students.length;
     elements.letterCount.textContent = state.admissionLetters.length;
+    updateOverviewCard();
+}
+
+function updateOverviewCard() {
+    const total = state.students.length;
+    const admitted = state.admissionLetters.length;
+    const pending = total - admitted;
+    const percentage = total > 0 ? Math.round((admitted / total) * 100) : 0;
+
+    if (elements.overviewTotal) {
+        elements.overviewTotal.textContent = total;
+    }
+    if (elements.overviewAdmitted) {
+        elements.overviewAdmitted.textContent = admitted;
+    }
+    if (elements.overviewProgress) {
+        elements.overviewProgress.style.width = `${percentage}%`;
+    }
+    if (elements.overviewHint) {
+        elements.overviewHint.textContent = `${percentage}% of applicants admitted`;
+    }
 }
 
 function toggleCourseSelection(courseId, type) {
@@ -932,11 +1049,13 @@ function refreshSelects() {
     }
 
     if (elements.studentSelect) {
-        elements.studentSelect.innerHTML = '<option value="">Choose student</option>' +
-            state.students
+        const datalist = document.getElementById('student-options');
+        if (datalist) {
+            datalist.innerHTML = state.students
                 .filter((student) => !state.admissionLetters.some((letter) => letter.student === student.id))
-                .map((student) => `<option value="${student.id}">${student.full_name}${student.address ? ' — ' + student.address : ''}</option>`)
+                .map((student) => `<option value="${escapeHtml(student.full_name)}">${student.address ? escapeHtml(student.address) : ''}</option>`)
                 .join('');
+        }
     }
 }
 
@@ -1126,7 +1245,7 @@ function renderNotificationsPage() {
             const time = notification.time_since || formatDate(notification.created_at);
             const status = notification.is_read ? 'Read' : 'Unread';
             return `
-            <tr class="${cls}">
+            <tr class="${cls}" data-notification-id="${notification.id}" style="cursor: pointer;">
                 <td>${index + 1}</td>
                 <td>${escapeHtml(notification.message)}</td>
                 <td>${escapeHtml(time)}</td>
@@ -1134,6 +1253,38 @@ function renderNotificationsPage() {
             </tr>`;
         })
         .join('');
+
+    elements.notificationsTable.querySelectorAll('tr[data-notification-id]').forEach((row) => {
+        row.addEventListener('click', () => {
+            const notificationId = Number(row.dataset.notificationId);
+            const notification = state.notifications.find((item) => item.id === notificationId);
+            if (notification) {
+                openNotificationModal(notification);
+            }
+        });
+    });
+}
+
+function openNotificationModal(notification) {
+    const modal = document.getElementById('notification-modal');
+    const messageEl = document.getElementById('notification-modal-message');
+    const timeEl = document.getElementById('notification-modal-time');
+    const statusEl = document.getElementById('notification-modal-status');
+
+    if (!modal || !messageEl || !timeEl || !statusEl) return;
+
+    messageEl.textContent = notification.message || '';
+    timeEl.textContent = 'Time: ' + (notification.time_since || formatDate(notification.created_at) || '');
+    statusEl.textContent = 'Status: ' + (notification.is_read ? 'Read' : 'Unread');
+
+    modal.classList.add('show');
+}
+
+function closeNotificationModal() {
+    const modal = document.getElementById('notification-modal');
+    if (modal) {
+        modal.classList.remove('show');
+    }
 }
 
 function escapeHtml(text) {
@@ -1282,7 +1433,7 @@ async function handleStudentSubmit(event) {
 async function handleLetterSubmit(event) {
     event.preventDefault();
     const form = event.target;
-    const studentId = Number(form.student_id.value);
+    const studentId = getSelectedStudentId();
     const registrationNumber = form.registration_number.value.trim();
     const sequenceNumber = Number(form.sequence_number.value);
 
@@ -1394,6 +1545,9 @@ async function handleLogin(event) {
 
         const data = await res.json();
         setToken(data.access);
+        if (data.refresh) {
+            setRefreshToken(data.refresh);
+        }
         window.location.href = '/';
     } catch (err) {
         showAlert('Login failed. Please try again.');
@@ -1443,9 +1597,38 @@ async function init() {
     elements.studentForm.addEventListener('submit', handleStudentSubmit);
     elements.letterForm.addEventListener('submit', handleLetterSubmit);
     if (elements.studentSelect) {
-        elements.studentSelect.addEventListener('change', (event) => {
-            updateLetterSequenceForStudent(Number(event.target.value));
+        const handleStudentSearchInput = () => {
+            const name = elements.studentSelect.value.trim();
+            if (!name) {
+                elements.letterForm.sequence_number.value = '';
+                elements.letterForm.registration_number.value = '';
+                return;
+            }
+            const cursorPosition = elements.studentSelect.selectionStart;
+            elements.studentSelect.value = elements.studentSelect.value
+                .split(' ')
+                .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+                .join(' ');
+            elements.studentSelect.setSelectionRange(cursorPosition, cursorPosition);
+            const studentId = getSelectedStudentId();
+            if (studentId) {
+                updateLetterSequenceForStudent(studentId);
+            }
+        };
+        elements.studentSelect.addEventListener('input', handleStudentSearchInput);
+        elements.studentSelect.addEventListener('change', handleStudentSearchInput);
+        elements.studentSelect.addEventListener('blur', handleStudentSearchInput);
+    }
+    const sequenceResetButton = document.getElementById('sequence-reset-button');
+    if (sequenceResetButton) {
+        sequenceResetButton.addEventListener('click', async () => {
+            await resetSequenceNumber();
         });
+    }
+    if (elements.letterForm.sequence_number) {
+        const updateRegFromSeq = () => updateRegistrationNumberFromSequence();
+        elements.letterForm.sequence_number.addEventListener('input', updateRegFromSeq);
+        elements.letterForm.sequence_number.addEventListener('change', updateRegFromSeq);
     }
     if (elements.programmeTypeSelect) {
         elements.programmeTypeSelect.addEventListener('change', () => {
@@ -1465,6 +1648,11 @@ async function init() {
         logoutButton.addEventListener('click', logout);
     }
     document.addEventListener('click', handleDocumentClick);
+
+    const modalCloseButton = document.getElementById('notification-modal-close');
+    if (modalCloseButton) {
+        modalCloseButton.addEventListener('click', closeNotificationModal);
+    }
 
     if (elements.studentSearchInput) {
         elements.studentSearchInput.addEventListener('input', () => renderStudents());

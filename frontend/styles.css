@@ -153,7 +153,7 @@ select {
 
 .cards-grid {
     display: grid;
-    gap: 10px;
+    gap: 6px;
     grid-template-columns: repeat(5, minmax(0, 1fr));
     margin-bottom: 14px;
 }
@@ -175,6 +175,71 @@ select {
     display: none;
 }
 
+.right-stat-cards {
+    display: grid;
+    gap: 6px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-column: 3 / 6;
+}
+
+.right-stat-cards .dashboard-overview-card {
+    grid-column: 1 / -1;
+}
+
+.dashboard-overview-card {
+    padding: 40px;
+    border-radius: 10px;
+}
+
+.dashboard-overview-card h3 {
+    margin: 0 0 10px;
+    font-size: 0.95rem;
+    color: #0f172a;
+}
+
+.overview-content {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.overview-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.85rem;
+}
+
+.overview-label {
+    color: #475569;
+}
+
+.overview-value {
+    font-weight: 600;
+    color: #0f172a;
+}
+
+.overview-progress {
+    height: 8px;
+    border-radius: 999px;
+    background: #e2e8f0;
+    overflow: hidden;
+}
+
+.overview-progress-bar {
+    height: 100%;
+    border-radius: 999px;
+    background: #4f46e5;
+    transition: width 0.3s ease;
+}
+
+.overview-hint {
+    margin: 0;
+    font-size: 0.75rem;
+    color: #475569;
+    text-align: right;
+}
+
 .card h2 {
     margin: 0 0 4px;
     font-size: 1.25rem;
@@ -187,29 +252,43 @@ select {
 }
 
 .dashboard-stat-card {
-    padding: 8px;
+    height: 80px;
+    padding: 6px;
     border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
 }
 
 .dashboard-stat-card h2 {
-    font-size: 1rem;
+    font-size: 0.95rem;
+    margin: 0 0 2px;
 }
 
 .dashboard-stat-card p {
-    font-size: 0.75rem;
+    font-size: 0.7rem;
 }
 
 .intake-stat-card {
-    padding: 6px;
+    height: 80px;
+    padding: 4px;
     border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
 }
 
 .intake-stat-card h2 {
-    font-size: 0.95rem;
+    font-size: 0.9rem;
+    margin: 0 0 2px;
 }
 
 .intake-stat-card p {
-    font-size: 0.7rem;
+    font-size: 0.65rem;
 }
 
 .panel {
@@ -421,6 +500,45 @@ select {
 .entity-form {
     display: grid;
     gap: 12px;
+}
+
+.sequence-field {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.sequence-field input {
+    flex: 1 1 auto;
+}
+
+.sequence-reset-button {
+    border: 1px solid #cbd5e1;
+    background: #f8fafc;
+    color: #0f172a;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 1rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.sequence-reset-button:hover {
+    background: #e2e8f0;
+    border-color: #94a3b8;
+}
+
+#student-search-input {
+    width: 100%;
+    padding: 8px 10px;
+    font-size: 0.9rem;
+    border-radius: 10px;
+    border: 1px solid #cbd5e1;
+    background: #f8fafc;
 }
 
 .form-scroll {
@@ -651,9 +769,18 @@ input[type="text"]:focus {
     overflow-y: auto;
 }
 
+#notifications .table-scroll {
+    max-height: calc(100vh - 280px);
+    overflow-y: auto;
+}
+
 #students .table-scroll {
     max-height: calc(100vh - 280px);
     overflow-y: auto;
+}
+
+#letters .table-scroll {
+    max-height: calc(100vh - 280px);
 }
 
 table {
@@ -670,6 +797,15 @@ td {
     text-align: left;
     vertical-align: middle;
     font-size: 0.85rem;
+}
+
+#notifications tbody tr {
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+#notifications tbody tr:hover {
+    background: #f8fafc;
 }
 
 th {
@@ -811,7 +947,7 @@ td {
     border-radius: 14px;
     box-shadow: 0 10px 25px rgba(15, 23, 42, 0.12);
     z-index: 300;
-    margin-top: 6px;
+    margin-top: 30px;
 }
 
 .notification-dropdown.show {
@@ -923,6 +1059,73 @@ td {
     font-size: 0.82rem;
 }
 
+.notification-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.45);
+    z-index: 400;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+}
+
+.notification-modal.show {
+    display: flex;
+}
+
+.notification-modal-content {
+    background: #ffffff;
+    border-radius: 16px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 20px 50px rgba(15, 23, 42, 0.25);
+    width: 100%;
+    max-width: 480px;
+    overflow: hidden;
+}
+
+.notification-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.notification-modal-header h3 {
+    margin: 0;
+    font-size: 1rem;
+}
+
+.notification-modal-close {
+    border: none;
+    background: transparent;
+    font-size: 1.4rem;
+    line-height: 1;
+    cursor: pointer;
+    color: #475569;
+    padding: 0 2px;
+}
+
+.notification-modal-close:hover {
+    color: #0f172a;
+}
+
+.notification-modal-body {
+    padding: 16px;
+    display: grid;
+    gap: 10px;
+}
+
+.notification-modal-body p {
+    margin: 0;
+}
+
+.notification-modal-meta {
+    font-size: 0.82rem;
+    color: #475569;
+}
+
 @media (max-width: 768px) {
     .notification-dropdown {
         width: 280px;
@@ -968,6 +1171,10 @@ td {
 @media (max-width: 980px) {
     .cards-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .right-stat-cards {
+        grid-column: 1 / -1;
     }
 
     .panel.split {
@@ -1064,6 +1271,39 @@ td {
     color: #4338ca;
 }
 
+.login-body {
+    margin: 0;
+    min-height: 100vh;
+    background: #0f172a;
+    color: #ffffff;
+}
+
+.login-background {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.login-background-logo {
+    width: 800px;
+    max-width: 95vw;
+    opacity: 0.35;
+}
+
+.login-body .app-shell {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+}
+
+.login-body .app-header {
+    display: none;
+}
+
 .login-page {
     display: grid;
     place-items: center;
@@ -1075,12 +1315,15 @@ td {
 .login-card {
     width: 100%;
     max-width: 380px;
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
     border-radius: 20px;
     padding: 28px 24px;
-    box-shadow: 0 16px 40px rgba(15, 23, 42, 0.06);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
     text-align: center;
+    color: #ffffff;
 }
 
 .login-header {
@@ -1095,7 +1338,7 @@ td {
 
 .login-header p {
     margin: 0;
-    color: #475569;
+    color: #cbd5e1;
     font-size: 0.95rem;
 }
 
@@ -1108,22 +1351,29 @@ td {
     display: grid;
     gap: 6px;
     font-size: 0.9rem;
-    color: #334155;
+    color: #e2e8f0;
+    text-align: left;
 }
 
 .login-form input {
     width: 100%;
     padding: 10px 12px;
     border-radius: 10px;
-    border: 1px solid #cbd5e1;
-    background: #f8fafc;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(15, 23, 42, 0.35);
+    color: #ffffff;
     font-size: 0.95rem;
 }
 
 .login-form input:focus {
-    outline: 2px solid #3b82f6;
+    outline: 2px solid #60a5fa;
     outline-offset: 2px;
     border-color: transparent;
+    background: rgba(15, 23, 42, 0.55);
+}
+
+.login-form input::placeholder {
+    color: rgba(255, 255, 255, 0.55);
 }
 
 .login-button {
@@ -1168,16 +1418,20 @@ td {
             grid-template-columns: repeat(2, minmax(0, 1fr));
         }
 
+        .right-stat-cards {
+            grid-column: 1 / -1;
+        }
+
         .panel.split {
             grid-template-columns: 1fr;
         }
 
         .intake-stat-card h2 {
-            font-size: 0.95rem;
+            font-size: 0.9rem;
         }
 
         .intake-stat-card p {
-            font-size: 0.7rem;
+            font-size: 0.65rem;
         }
     }
 
@@ -1239,7 +1493,7 @@ td {
         }
 
         .dashboard-stat-card h2 {
-            font-size: 1rem;
+            font-size: 0.95rem;
         }
 
         .dashboard-stat-card p {
