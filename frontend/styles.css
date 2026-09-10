@@ -154,7 +154,7 @@ select {
 
 .cards-grid {
     display: grid;
-    gap: 10px;
+    gap: 6px;
     grid-template-columns: repeat(5, minmax(0, 1fr));
     margin-bottom: 14px;
 }
@@ -178,7 +178,7 @@ select {
 
 .right-stat-cards {
     display: grid;
-    gap: 10px;
+    gap: 6px;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     grid-column: 3 / 6;
 }
@@ -188,7 +188,7 @@ select {
 }
 
 .dashboard-overview-card {
-    padding: 12px;
+    padding: 40px;
     border-radius: 10px;
 }
 
