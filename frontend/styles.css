@@ -155,15 +155,8 @@ select {
 .cards-grid {
     display: grid;
     gap: 10px;
-    grid-template-columns: 2fr 3fr;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
     margin-bottom: 14px;
-    align-items: start;
-}
-
-.right-stat-cards {
-    display: grid;
-    gap: 10px;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 .card {
@@ -175,67 +168,12 @@ select {
 }
 
 .programmes-card {
+    grid-column: span 2;
 }
 
 .programmes-card > h2:first-child,
 .programmes-card > p {
     display: none;
-}
-
-.dashboard-overview-card {
-    grid-column: 1 / -1;
-    padding: 12px;
-    border-radius: 10px;
-    margin-top: 10px;
-}
-
-.dashboard-overview-card h3 {
-    margin: 0 0 10px;
-    font-size: 0.95rem;
-    color: #0f172a;
-}
-
-.overview-content {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.overview-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 0.85rem;
-}
-
-.overview-label {
-    color: #475569;
-}
-
-.overview-value {
-    font-weight: 600;
-    color: #0f172a;
-}
-
-.overview-progress {
-    height: 8px;
-    border-radius: 999px;
-    background: #e2e8f0;
-    overflow: hidden;
-}
-
-.overview-progress-bar {
-    height: 100%;
-    border-radius: 999px;
-    background: #4f46e5;
-    transition: width 0.3s ease;
-}
-
-.overview-hint {
-    margin: 0;
-    font-size: 0.75rem;
-    color: #475569;
-    text-align: right;
 }
 
 .card h2 {
@@ -1091,10 +1029,6 @@ td {
 
 @media (max-width: 980px) {
     .cards-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .right-stat-cards {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
@@ -1120,10 +1054,6 @@ td {
     }
 
     #dashboard .programme-charts {
-        grid-template-columns: 1fr;
-    }
-
-    .right-stat-cards {
         grid-template-columns: 1fr;
     }
 }
@@ -1340,10 +1270,6 @@ td {
     /* 980px — transition from desktop to tablet */
     @media (max-width: 980px) {
         .cards-grid {
-            grid-template-columns: 1fr;
-        }
-
-        .right-stat-cards {
             grid-template-columns: repeat(2, minmax(0, 1fr));
         }
 
