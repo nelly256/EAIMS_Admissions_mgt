@@ -770,6 +770,11 @@ input[type="text"]:focus {
     overflow-y: auto;
 }
 
+#notifications .table-scroll {
+    max-height: calc(100vh - 280px);
+    overflow-y: auto;
+}
+
 #students .table-scroll {
     max-height: calc(100vh - 280px);
     overflow-y: auto;
