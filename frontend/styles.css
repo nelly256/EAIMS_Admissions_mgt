@@ -50,7 +50,6 @@ select {
 .app-header h1 {
     margin: 0 0 2px;
     font-size: 1.3rem;
-    text-align: center;
 }
 
 .header-logo {
@@ -743,7 +742,7 @@ td {
 
 .header-top {
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
     flex-wrap: wrap;
     gap: 8px;
@@ -751,16 +750,12 @@ td {
     min-height: 40px;
 }
 
-.header-top > div:first-child {
-    text-align: center;
+.header-title {
     flex: 1;
+    text-align: center;
 }
 
 .header-actions {
-    position: absolute;
-    right: 0;
-    top: 50%;
-    transform: translateY(-50%);
     display: inline-flex;
     align-items: center;
     gap: 4px;
@@ -1622,5 +1617,169 @@ td {
         .student-filters {
             gap: 4px;
         }
+    }
+
+    /* ===== Modal Styles ===== */
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(15, 23, 42, 0.6);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        padding: 20px;
+        box-sizing: border-box;
+    }
+
+    .modal-container {
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 20px 40px rgba(15, 23, 42, 0.2);
+        max-width: 900px;
+        width: 100%;
+        max-height: 90vh;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    .email-modal {
+        max-width: 500px;
+    }
+
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 16px 24px;
+        border-bottom: 1px solid #e2e8f0;
+        background: #f8fafc;
+    }
+
+    .modal-header h2 {
+        margin: 0;
+        font-size: 1.1rem;
+        color: #0f172a;
+    }
+
+    .modal-close {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: #64748b;
+        padding: 4px 8px;
+        line-height: 1;
+    }
+
+    .modal-close:hover {
+        color: #ef4444;
+    }
+
+    .modal-body {
+        padding: 24px;
+        overflow-y: auto;
+        flex: 1;
+    }
+
+    .preview-frame {
+        width: 100%;
+        height: 60vh;
+        min-height: 400px;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        background: #fff;
+    }
+
+    .email-confirm-details p {
+        margin: 8px 0;
+        font-size: 0.9rem;
+        color: #1e293b;
+    }
+
+    .email-confirm-details strong {
+        color: #0f172a;
+    }
+
+    .modal-footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        padding: 16px 24px;
+        border-top: 1px solid #e2e8f0;
+        background: #f8fafc;
+    }
+
+    .modal-footer .action-button,
+    .modal-footer .primary-button {
+        min-width: 100px;
+    }
+
+    /* Status badges */
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 4px 10px;
+        border-radius: 999px;
+        font-size: 0.75rem;
+        font-weight: 500;
+    }
+
+    .status-badge.not-generated {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .status-badge.generated {
+        background: #dbeafe;
+        color: #1e40af;
+    }
+
+    .status-badge.sent {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .status-badge.failed {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    /* Action buttons in table */
+    .action-buttons {
+        display: flex;
+        gap: 6px;
+    }
+
+    .action-buttons .icon-button {
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 6px 8px;
+        border-radius: 6px;
+        color: #475569;
+        font-size: 1rem;
+        transition: background 0.2s, color 0.2s;
+    }
+
+    .action-buttons .icon-button:hover {
+        background: #f1f5f9;
+    }
+
+    .action-buttons .icon-button.view:hover {
+        color: #3b82f6;
+    }
+
+    .action-buttons .icon-button.resend:hover {
+        color: #f59e0b;
+    }
+
+    .action-buttons .icon-button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
     }
 

@@ -45,7 +45,23 @@ const elements = {
     notificationList: document.getElementById('notification-list'),
     studentSearchInput: document.getElementById('student-search'),
     studentFilterType: document.getElementById('filter-programme-type'),
-    clearFiltersButton: document.getElementById('clear-filters')
+    clearFiltersButton: document.getElementById('clear-filters'),
+    // Letter preview modal elements
+    letterPreviewModal: document.getElementById('letter-preview-modal'),
+    letterPreviewFrame: document.getElementById('letter-preview-frame'),
+    letterPreviewClose: document.getElementById('letter-preview-close'),
+    previewDownloadPdf: document.getElementById('preview-download-pdf'),
+    previewPrint: document.getElementById('preview-print'),
+    previewShareEmail: document.getElementById('preview-share-email'),
+    previewClose: document.getElementById('preview-close'),
+    // Email confirmation modal elements
+    emailConfirmModal: document.getElementById('email-confirm-modal'),
+    emailConfirmClose: document.getElementById('email-confirm-close'),
+    emailConfirmCancel: document.getElementById('email-confirm-cancel'),
+    emailConfirmSend: document.getElementById('email-confirm-send'),
+    emailConfirmTo: document.getElementById('email-confirm-to'),
+    emailConfirmSubject: document.getElementById('email-confirm-subject'),
+    emailConfirmMessage: document.getElementById('email-confirm-message'),
 };
 
 const selectedCourses = { Diploma: new Set(), Certificate: new Set() };
@@ -446,16 +462,456 @@ function renderLetters() {
     elements.letterTable.innerHTML = state.admissionLetters
         .map((letter, index) => {
             const student = state.students.find((item) => item.id === letter.student);
+            const programme = student && student.course ? student.course.course_name : '—';
+            const intake = student && student.intake ? `${student.intake.intake_name} ${student.intake.academic_year}` : '—';
+            const statusClass = `status-badge ${letter.status || 'not_generated'}`;
+            const statusText = letter.status_display || letter.status || 'Not Generated';
+            const canView = letter.status !== 'not_generated';
+            const canResend = letter.status === 'sent' || letter.status === 'generated';
+
             return `
             <tr>
                 <td>${index + 1}</td>
                 <td>${student ? student.full_name : 'Unknown'}</td>
                 <td>${letter.registration_number}</td>
-                <td>${letter.sequence_number}</td>
+                <td>${programme}</td>
+                <td>${intake}</td>
                 <td>${formatDate(letter.generated_date)}</td>
+                <td><span class="${statusClass}">${statusText}</span></td>
+                <td>
+                    <div class="action-buttons">
+                        <button class="icon-button view" onclick="previewLetter(${letter.id})" ${!canView ? 'disabled' : ''} title="View Letter">👁</button>
+                        <button class="icon-button resend" onclick="resendLetter(${letter.id})" ${!canResend ? 'disabled' : ''} title="Resend Email">↻</button>
+                    </div>
+                </td>
             </tr>`;
         })
         .join('');
+}
+
+/* ===== Admission Letter Preview & Email ===== */
+
+let currentPreviewLetterId = null;
+
+async function previewLetter(letterId) {
+    currentPreviewLetterId = letterId;
+    try {
+        const letter = await apiFetch(`/letters/${letterId}/preview/`);
+        renderLetterPreview(letter);
+        openLetterPreviewModal();
+    } catch (err) {
+        if (err.message !== 'Unauthorized') {
+            showAlert(err.detail || err.message || 'Failed to load letter preview.');
+        }
+    }
+}
+
+function renderLetterPreview(letter) {
+    const studentName = letter.student_name || 'Student';
+    const programme = letter.programme || '—';
+    const intake = letter.intake || '—';
+    const regNumber = letter.registration_number || '—';
+    const seqNumber = letter.sequence_number || '—';
+    const admissionDate = letter.generated_date ? formatDate(letter.generated_date) : '—';
+    const studentEmail = letter.student_email || '';
+
+    // Determine qualification and duration based on programme type
+    const student = state.students.find(s => s.id === letter.student);
+    const isDiploma = student && student.programme_type === 'Diploma';
+    const qualification = isDiploma ? 'Diploma' : 'Certificate';
+    const duration = isDiploma ? 'two-year' : 'one-year';
+    const startDate = letter.generated_date ? formatDate(letter.generated_date) : '—';
+
+    // Application/receipt number
+    const appNumber = `APP-${String(seqNumber).padStart(6, '0')}`;
+
+    const html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <style>
+            @import url('https://fonts.googleapis.com/css2?family=Times+New+Roman&display=swap');
+            * { margin: 0; padding: 0; box-sizing: border-box; }
+            body { 
+                font-family: 'Times New Roman', Times, serif; 
+                color: #000; 
+                line-height: 1.6; 
+                padding: 2cm;
+                font-size: 11.5pt;
+            }
+            /* Header */
+            .header-table { width: 100%; border-collapse: collapse; margin-bottom: 6px; }
+            .header-table td { vertical-align: top; padding: 0; }
+            .logo-cell { width: 55px; }
+            .logo-img { width: 50px; height: 50px; object-fit: contain; }
+            .logo-fallback { 
+                width: 40px; height: 40px; 
+                background: linear-gradient(45deg, #FFD700 0%, #FFD700 50%, #228B22 50%, #228B22 100%);
+                display: flex;
+            }
+            .logo-fallback::after {
+                content: '';
+                position: absolute;
+                width: 40px; height: 40px;
+                background: linear-gradient(45deg, #1E3A8A 0%, #1E3A8A 50%, #CC0000 50%, #CC0000 100%);
+                top: 20px; left: 20px;
+            }
+            .text-cell { padding-left: 10px; }
+            .inst-name { 
+                font-family: 'Times New Roman', Times, serif; 
+                font-weight: bold; 
+                font-size: 14pt; 
+                line-height: 17pt; 
+                margin-bottom: 2px; 
+            }
+            .office-name { 
+                font-family: 'Times New Roman', Times, serif; 
+                font-weight: bold; 
+                font-size: 11pt; 
+                line-height: 14pt; 
+                margin-bottom: 4px; 
+            }
+            .header-info { 
+                font-family: 'Times New Roman', Times, serif; 
+                font-size: 8pt; 
+                line-height: 10pt; 
+                text-align: center; 
+                color: #333; 
+                margin: 1px 0;
+            }
+            /* Multicolored divider */
+            .divider { 
+                height: 6px; 
+                margin: 16px 0; 
+                display: flex; 
+            }
+            .divider span { 
+                flex: 1; 
+                height: 6px; 
+            }
+            .divider .yellow { background: #FFD700; }
+            .divider .green { background: #228B22; }
+            .divider .blue { background: #1E3A8A; }
+            .divider .red { background: #CC0000; }
+            .divider .white { background: #FFFFFF; border: 1px solid #ddd; }
+            /* Title */
+            .letter-title { 
+                font-family: 'Times New Roman', Times, serif; 
+                font-weight: bold; 
+                font-size: 15pt; 
+                line-height: 19pt; 
+                text-align: center; 
+                color: #CC0000; 
+                margin: 6px 0 14px 0; 
+            }
+            /* Student details */
+            .details-table { width: 100%; border-collapse: collapse; margin-bottom: 16px; }
+            .details-table td { vertical-align: middle; padding: 4px 0; }
+            .details-table .label { 
+                font-family: 'Times New Roman', Times, serif; 
+                font-weight: bold; 
+                font-size: 11pt; 
+                line-height: 15pt; 
+                width: 220px; 
+            }
+            .details-table .value { 
+                font-family: 'Times New Roman', Times, serif; 
+                font-size: 11pt; 
+                line-height: 15pt; 
+                text-decoration: underline; 
+            }
+            /* Body text */
+            .body-text { 
+                font-family: 'Times New Roman', Times, serif; 
+                font-size: 11.5pt; 
+                line-height: 16pt; 
+                text-align: justify; 
+                margin-bottom: 8pt; 
+            }
+            .body-text b { font-weight: bold; }
+            /* Document list */
+            .doc-list { 
+                font-family: 'Times New Roman', Times, serif; 
+                font-size: 11pt; 
+                line-height: 15pt; 
+                text-align: justify; 
+                margin: 4px 0; 
+                padding-left: 20px; 
+                text-indent: -20px;
+            }
+            /* Closing */
+            .closing { 
+                font-family: 'Times New Roman', Times, serif; 
+                font-size: 11.5pt; 
+                line-height: 16pt; 
+                margin-top: 20pt; 
+            }
+            .signature { 
+                font-family: 'Times New Roman', Times, serif; 
+                font-size: 11.5pt; 
+                line-height: 16pt; 
+                margin-top: 40pt; 
+            }
+            .signature b { display: block; margin-bottom: 6pt; }
+        </style>
+    </head>
+    <body>
+        <!-- Header Table -->
+        <table class="header-table">
+            <tr>
+                <td class="logo-cell">
+                    <img src="/static/logo.jpg" alt="EAIMS Logo" class="logo-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div class="logo-fallback" style="display:none;"></div>
+                </td>
+                <td class="text-cell">
+                    <div class="inst-name">EAST AFRICAN INSTITUTE FOR MANAGEMENT SCIENCE</div>
+                    <div class="office-name">NORTHERN UGANDA REGIONAL OFFICE</div>
+                    <div class="header-info">P. O. BOX 701 – GULU</div>
+                    <div class="header-info">Plot 6/8 Alex Latim Road, Opposite Kingdom Hall of Jehovah Witness.</div>
+                    <div class="header-info">Tel: 0772394768 / 058142176 – email: eastmstitute@yahoo.com</div>
+                    <div class="header-info">EAIMS is licensed by the Ministry of Education and Sports - Ref No. UME/TVET/071</div>
+                    <div class="header-info">NCHE REF: TE/PL. 052, UBTVET - C</div>
+                    <div class="header-info">CENTRE No. UVT 645</div>
+                </td>
+            </tr>
+        </table>
+
+        <!-- Multicolored Divider -->
+        <div class="divider">
+            <span class="yellow"></span>
+            <span class="green"></span>
+            <span class="blue"></span>
+            <span class="red"></span>
+            <span class="white"></span>
+        </div>
+
+        <!-- Title -->
+        <div class="letter-title">ADMISSION LETTER</div>
+
+        <!-- Student Details -->
+        <table class="details-table">
+            <tr>
+                <td class="label">STUDENT'S NAME:</td>
+                <td class="value">${studentName}</td>
+            </tr>
+            <tr>
+                <td class="label">REGISTRATION NUMBER:</td>
+                <td class="value">${regNumber}</td>
+            </tr>
+            <tr>
+                <td class="label">APPLICATION/RECEIPT NUMBER:</td>
+                <td class="value">${appNumber}</td>
+            </tr>
+        </table>
+
+        <!-- Body Paragraphs -->
+        <p class="body-text">
+            I write to offer you admission at this Institute for the <b>${intake}</b> 
+            for a <b>${duration}</b> course of study leading to the award of a 
+            <b>${qualification}</b> IN <b>${programme.toUpperCase()}</b>.
+        </p>
+        <p class="body-text">
+            You have been admitted as a privately sponsored student at the Institute's Main Campus 
+            located on Plot 6/8 Alex Latim Road, Next to Radio Favour FM - Pece Vangard, 
+            Pece – Laroo Division, Gulu City.
+        </p>
+        <p class="body-text">
+            The course starts on <b>${startDate}</b> and therefore, you should ensure that you 
+            report and register with the Institute's Admissions Office within two weeks 
+            from the beginning of the semester.
+        </p>
+        <p class="body-text">
+            This is a provisional offer made on the basis of the documents and information 
+            as submitted on your application form as they will be subjected to verification. 
+            You will be asked to present more (if necessary) supporting and convincing evidence 
+            at the time of registration including but not limited to:
+        </p>
+
+        <!-- Document List -->
+        <p class="doc-list">a) Original Uganda Advanced Certificate of Education (UACE) or its equivalent.</p>
+        <p class="doc-list">b) Original Uganda Certificate of Education (UCE) or its equivalent.</p>
+        <p class="doc-list">c) Two (2) current colored passport size photographs.</p>
+        <p class="doc-list">d) A copy of the Identity Card from your previous school or current employer.</p>
+        <p class="doc-list">e) Original National Identification Card or Birth Certificate.</p>
+
+        <!-- Closing -->
+        <p class="closing">Yours faithfully,</p>
+        <p class="signature">
+            <b>[Authorized Officer]</b>
+            <span>EAIMS Admissions Office</span>
+        </p>
+    </body>
+    </html>`;
+
+    elements.letterPreviewFrame.srcdoc = html;
+}
+
+function openLetterPreviewModal() {
+    if (elements.letterPreviewModal) {
+        elements.letterPreviewModal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    }
+}
+
+function closeLetterPreviewModal() {
+    if (elements.letterPreviewModal) {
+        elements.letterPreviewModal.style.display = 'none';
+        document.body.style.overflow = '';
+    }
+    if (elements.letterPreviewFrame) {
+        elements.letterPreviewFrame.srcdoc = '';
+    }
+    currentPreviewLetterId = null;
+}
+
+async function downloadLetterPdf(letterId) {
+    try {
+        const response = await fetch(`${API_BASE}/letters/${letterId}/download-pdf/`, {
+            headers: {
+                'Authorization': `Bearer ${getToken()}`
+            }
+        });
+        if (!response.ok) throw new Error('Failed to download PDF');
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `EAIMS_Admission_Letter_${letterId}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+    } catch (err) {
+        showAlert('Failed to download PDF: ' + err.message);
+    }
+}
+
+function printLetter() {
+    if (elements.letterPreviewFrame) {
+        elements.letterPreviewFrame.contentWindow.focus();
+        elements.letterPreviewFrame.contentWindow.print();
+    }
+}
+
+function openEmailConfirmModal(letter) {
+    const studentName = letter.student_name || 'Student';
+    const studentEmail = letter.student_email || letter.recipient_email || '';
+    const programme = letter.programme || 'Programme';
+    const intake = letter.intake || 'Intake';
+
+    elements.emailConfirmTo.textContent = studentEmail;
+    elements.emailConfirmSubject.textContent = `EAIMS Admission Letter – ${studentName}`;
+    elements.emailConfirmMessage.innerHTML = `
+        Dear ${studentName},<br><br>
+        Congratulations!<br><br>
+        We are pleased to inform you that you have been admitted to EAIMS for the
+        ${programme} programme under the ${intake} intake.<br><br>
+        Please find your official admission letter attached to this email.<br><br>
+        Kindly review the letter and follow the instructions provided.<br><br>
+        Regards,<br>
+        EAIMS Admissions Office
+    `;
+
+    elements.emailConfirmModal.dataset.letterId = letter.id;
+    if (elements.emailConfirmModal) {
+        elements.emailConfirmModal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    }
+}
+
+function closeEmailConfirmModal() {
+    if (elements.emailConfirmModal) {
+        elements.emailConfirmModal.style.display = 'none';
+        document.body.style.overflow = '';
+    }
+    delete elements.emailConfirmModal.dataset.letterId;
+}
+
+async function sendLetterEmail() {
+    const letterId = elements.emailConfirmModal?.dataset.letterId;
+    if (!letterId) return;
+
+    closeEmailConfirmModal();
+
+    try {
+        const result = await apiFetch(`/letters/${letterId}/send-email/`, { method: 'POST' });
+        showAlert(result.message || 'Admission letter sent successfully!');
+        await refreshData();
+    } catch (err) {
+        if (err.message !== 'Unauthorized') {
+            showAlert(err.detail || err.message || 'Failed to send email.');
+        }
+    }
+}
+
+async function resendLetter(letterId) {
+    const letter = state.admissionLetters.find(l => l.id === letterId);
+    if (!letter) return;
+
+    const studentEmail = letter.student_email || letter.recipient_email || '';
+    const studentName = letter.student_name || 'Student';
+
+    if (confirm(`This admission letter has already been sent to ${studentEmail}. Do you want to resend it?`)) {
+        try {
+            const result = await apiFetch(`/letters/${letterId}/resend-email/`, { method: 'POST' });
+            showAlert(result.message || 'Admission letter resent successfully!');
+            await refreshData();
+        } catch (err) {
+            if (err.message !== 'Unauthorized') {
+                showAlert(err.detail || err.message || 'Failed to resend email.');
+            }
+        }
+    }
+}
+
+function setupLetterPreviewModal() {
+    if (elements.letterPreviewClose) {
+        elements.letterPreviewClose.addEventListener('click', closeLetterPreviewModal);
+    }
+    if (elements.previewClose) {
+        elements.previewClose.addEventListener('click', closeLetterPreviewModal);
+    }
+    if (elements.previewDownloadPdf) {
+        elements.previewDownloadPdf.addEventListener('click', () => {
+            if (currentPreviewLetterId) downloadLetterPdf(currentPreviewLetterId);
+        });
+    }
+    if (elements.previewPrint) {
+        elements.previewPrint.addEventListener('click', printLetter);
+    }
+    if (elements.previewShareEmail) {
+        elements.previewShareEmail.addEventListener('click', () => {
+            const letter = state.admissionLetters.find(l => l.id === currentPreviewLetterId);
+            if (letter) {
+                closeLetterPreviewModal();
+                openEmailConfirmModal(letter);
+            }
+        });
+    }
+
+    // Close on overlay click
+    if (elements.letterPreviewModal) {
+        elements.letterPreviewModal.addEventListener('click', (e) => {
+            if (e.target === elements.letterPreviewModal) closeLetterPreviewModal();
+        });
+    }
+
+    // Email confirmation modal
+    if (elements.emailConfirmClose) {
+        elements.emailConfirmClose.addEventListener('click', closeEmailConfirmModal);
+    }
+    if (elements.emailConfirmCancel) {
+        elements.emailConfirmCancel.addEventListener('click', closeEmailConfirmModal);
+    }
+    if (elements.emailConfirmSend) {
+        elements.emailConfirmSend.addEventListener('click', sendLetterEmail);
+    }
+    if (elements.emailConfirmModal) {
+        elements.emailConfirmModal.addEventListener('click', (e) => {
+            if (e.target === elements.emailConfirmModal) closeEmailConfirmModal();
+        });
+    }
 }
 
 function populateCourseOptions(type) {
@@ -1000,6 +1456,7 @@ async function init() {
     setupIntakeButtons();
     setupNotificationBell();
     setupStudentFilters();
+    setupLetterPreviewModal();
     resetIntakeSelection();
     startNotificationPolling();
 

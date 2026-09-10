@@ -5,14 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>EAIMS Admissions Frontend</title>
     {% load static %}
-    <link rel="stylesheet" href="{% static 'styles.css' %}?v=19" />
+    <link rel="stylesheet" href="{% static 'styles.css' %}?v=23" />
 </head>
 <body>
     <div class="app-shell">
         <header class="app-header">
             <img class="header-logo" src="{% static 'logo.jpg' %}" alt="EAIMS logo" />
             <div class="header-top">
-                <div>
+                <div class="header-title">
                     <h1>EAIMS Admissions</h1>
                 </div>
                 <div class="header-actions">
@@ -42,7 +42,7 @@
                 <button class="tab-button active" data-target="dashboard">Dashboard</button>
                 <button class="tab-button" data-target="programmes">Programmes</button>
                 <button class="tab-button" data-target="intakes">Intakes</button>
-                <button class="tab-button" data-target="notifications">Applications</button>
+                <button class="tab-button" data-target="notifications">Notifications</button>
                 <button class="tab-button" data-target="students">Students</button>
                 <button class="tab-button" data-target="letters">Admission Letters</button>
             </nav>
@@ -342,8 +342,11 @@
                                         <th>#</th>
                                         <th>Student</th>
                                         <th>Reg. Number</th>
-                                        <th>Sequence</th>
+                                        <th>Programme</th>
+                                        <th>Intake</th>
                                         <th>Date</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody id="letters-table"></tbody>
@@ -379,6 +382,47 @@
         </main>
     </div>
 
-    <script src="{% static 'app.js' %}?v=15" defer></script>
+    <!-- Admission Letter Preview Modal -->
+    <div id="letter-preview-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h2>Admission Letter Preview</h2>
+                <button type="button" class="modal-close" id="letter-preview-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <iframe id="letter-preview-frame" class="preview-frame" src="about:blank"></iframe>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="action-button" id="preview-download-pdf">Download PDF</button>
+                <button type="button" class="action-button" id="preview-print">Print</button>
+                <button type="button" class="primary-button" id="preview-share-email">Share via Email</button>
+                <button type="button" class="action-button" id="preview-close">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Email Confirmation Modal -->
+    <div id="email-confirm-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-container email-modal">
+            <div class="modal-header">
+                <h2>Confirm Email</h2>
+                <button type="button" class="modal-close" id="email-confirm-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="email-confirm-details">
+                    <p><strong>To:</strong> <span id="email-confirm-to"></span></p>
+                    <p><strong>Subject:</strong> <span id="email-confirm-subject"></span></p>
+                    <hr style="margin: 12px 0; border-color: #e2e8f0;">
+                    <p id="email-confirm-message"></p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="action-button" id="email-confirm-cancel">Cancel</button>
+                <button type="button" class="primary-button" id="email-confirm-send">Send Email</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="{% static 'app.js' %}?v=23" defer></script>
 </body>
 </html>

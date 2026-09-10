@@ -57,17 +57,32 @@ class StudentSerializer(serializers.ModelSerializer):
 
 class AdmissionLetterSerializer(serializers.ModelSerializer):
     student_name = serializers.SerializerMethodField()
+    programme = serializers.SerializerMethodField()
+    intake = serializers.SerializerMethodField()
+    student_email = serializers.SerializerMethodField()
+    status_display = serializers.CharField(source='get_status_display', read_only=True)
 
     class Meta:
         model = AdmissionLetter
         fields = [
-            'id', 'student', 'student_name', 'registration_number',
-            'sequence_number', 'generated_date',
+            'id', 'student', 'student_name', 'programme', 'intake', 'student_email',
+            'registration_number', 'sequence_number', 'generated_date',
+            'status', 'status_display', 'sent_date', 'recipient_email', 'sent_count',
         ]
-        read_only_fields = ['generated_date']
+        read_only_fields = ['id', 'student_name', 'programme', 'intake', 'student_email',
+                            'generated_date', 'status', 'status_display', 'sent_date', 'recipient_email', 'sent_count']
 
     def get_student_name(self, obj):
         return obj.student.full_name
+
+    def get_programme(self, obj):
+        return obj.student.course.course_name if obj.student and obj.student.course else None
+
+    def get_intake(self, obj):
+        return f'{obj.student.intake.intake_name} {obj.student.intake.academic_year}' if obj.student and obj.student.intake else None
+
+    def get_student_email(self, obj):
+        return obj.student.email if obj.student else None
 
     def validate_student(self, student):
         if AdmissionLetter.objects.filter(student=student).exists():

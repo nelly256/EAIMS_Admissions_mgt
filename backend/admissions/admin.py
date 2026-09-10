@@ -22,7 +22,17 @@ class StudentAdmin(admin.ModelAdmin):
 
 @admin.register(AdmissionLetter)
 class AdmissionLetterAdmin(admin.ModelAdmin):
-    list_display = ('registration_number', 'student', 'sequence_number', 'generated_date')
+    list_display = ('registration_number', 'student', 'programme', 'intake', 'sequence_number', 'generated_date', 'status', 'sent_date')
+    list_filter = ('status', 'generated_date', 'sent_date')
+    readonly_fields = ('student', 'registration_number', 'sequence_number', 'generated_date', 'status', 'sent_date', 'recipient_email', 'sent_count')
+
+    def programme(self, obj):
+        return obj.student.course.course_name if obj.student and obj.student.course else '-'
+    programme.short_description = 'Programme'
+
+    def intake(self, obj):
+        return f'{obj.student.intake.intake_name} {obj.student.intake.academic_year}' if obj.student and obj.student.intake else '-'
+    intake.short_description = 'Intake'
 
 
 @admin.register(Notification)
