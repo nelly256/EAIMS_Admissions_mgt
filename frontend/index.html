@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>EAIMS Admissions Frontend</title>
     {% load static %}
-    <link rel="stylesheet" href="{% static 'styles.css' %}?v=23" />
+    <link rel="stylesheet" href="{% static 'styles.css' %}?v=24" />
 </head>
 <body>
     <div class="app-shell">
@@ -98,24 +98,24 @@
                             <h2 id="letter-count">0</h2>
                             <p>Admission Letters</p>
                         </article>
-                        <article class="card dashboard-overview-card">
-                            <h3>Admission Overview</h3>
-                            <div class="overview-content">
-                                <div class="overview-item">
-                                    <span class="overview-label">Total Applicants</span>
-                                    <span class="overview-value" id="overview-total">0</span>
-                                </div>
-                                <div class="overview-item">
-                                    <span class="overview-label">Admitted</span>
-                                    <span class="overview-value" id="overview-admitted">0</span>
-                                </div>
-                                <div class="overview-progress">
-                                    <div class="overview-progress-bar" id="overview-progress" style="width: 0%;"></div>
-                                </div>
-                                <p class="overview-hint" id="overview-hint">0% of applicants admitted</p>
-                            </div>
-                        </article>
                     </div>
+                    <article class="card dashboard-overview-card">
+                        <h3>Admission Overview</h3>
+                        <div class="overview-content">
+                            <div class="overview-item">
+                                <span class="overview-label">Total Applicants</span>
+                                <span class="overview-value" id="overview-total">0</span>
+                            </div>
+                            <div class="overview-item">
+                                <span class="overview-label">Admitted</span>
+                                <span class="overview-value" id="overview-admitted">0</span>
+                            </div>
+                            <div class="overview-progress">
+                                <div class="overview-progress-bar" id="overview-progress" style="width: 0%;"></div>
+                            </div>
+                            <p class="overview-hint" id="overview-hint">0% of applicants admitted</p>
+                        </div>
+                    </article>
                 </div>
                 <section class="panel" id="demographic-insights">
                     <h2>Demographic & Geographical Insights</h2>

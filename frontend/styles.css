@@ -166,10 +166,6 @@ select {
     grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
-.right-stat-cards .dashboard-overview-card {
-    grid-column: span 3;
-}
-
 .card {
     padding: 12px;
     border-radius: 14px;
@@ -187,8 +183,7 @@ select {
 }
 
 .dashboard-overview-card {
-    max-width: calc((100% - 20px) * 0.6);
-    margin-left: auto;
+    grid-column: 1 / -1;
     padding: 12px;
     border-radius: 10px;
     margin-top: 10px;
@@ -1103,10 +1098,6 @@ td {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
-    .right-stat-cards .dashboard-overview-card {
-        grid-column: span 2;
-    }
-
     .panel.split {
         grid-template-columns: 1fr;
     }
@@ -1134,10 +1125,6 @@ td {
 
     .right-stat-cards {
         grid-template-columns: 1fr;
-    }
-
-    .right-stat-cards .dashboard-overview-card {
-        grid-column: span 1;
     }
 }
 
@@ -1358,10 +1345,6 @@ td {
 
         .right-stat-cards {
             grid-template-columns: repeat(2, minmax(0, 1fr));
-        }
-
-        .right-stat-cards .dashboard-overview-card {
-            grid-column: span 2;
         }
 
         .panel.split {
