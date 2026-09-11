@@ -539,14 +539,24 @@ class AdmissionLetterViewSet(viewsets.ModelViewSet):
             serializer = self.get_serializer(existing_letter)
             return Response(serializer.data, status=status.HTTP_200_OK)
 
-        sequence = request.data.get('sequence_number') or AdmissionLetter.objects.filter(
-            student__course=course
-        ).count() + 1
-
+        # Generate registration number in format: YY/EAG/{D|C}{COURSE_CODE}{SEQ}
+        # e.g., 26/EAG/CPM0002
         intake_code = ''.join(
             c[0].upper() for c in intake.intake_name.split() if c
         )[:3].ljust(3, 'X')
-        reg_number = request.data.get('registration_number') or f'{intake.academic_year}-{intake_code}-{str(sequence).zfill(4)}'
+
+        # Count letters for this intake/year and course type to ensure unique sequence
+        programme_type_letter = 'D' if course.programme_type == 'Diploma' else 'C'
+        course_code = course.course_code or 'PG'
+        
+        # Count existing letters for this intake/year with same programme type and course code prefix
+        prefix = f'{str(intake.academic_year)[-2:].zfill(2)}/EAG/{programme_type_letter}{course_code}'
+        sequence = request.data.get('sequence_number') or AdmissionLetter.objects.filter(
+            registration_number__startswith=prefix
+        ).count() + 1
+
+        yy = str(intake.academic_year)[-2:].zfill(2)
+        reg_number = request.data.get('registration_number') or f'{yy}/EAG/{programme_type_letter}{course_code}{str(sequence).zfill(4)}'
 
         letter = AdmissionLetter.objects.create(
             student=student,
