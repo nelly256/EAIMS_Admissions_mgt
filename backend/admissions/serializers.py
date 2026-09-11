@@ -67,10 +67,11 @@ class AdmissionLetterSerializer(serializers.ModelSerializer):
         model = AdmissionLetter
         fields = [
             'id', 'student', 'student_name', 'programme', 'intake', 'student_email', 'programme_type',
-            'registration_number', 'sequence_number', 'generated_date',
-            'status', 'status_display', 'sent_date', 'recipient_email', 'sent_count',
+            'registration_number', 'sequence_number', 'student_number',
+            'generated_date', 'status', 'status_display', 'sent_date', 'recipient_email', 'sent_count',
         ]
         read_only_fields = ['id', 'student_name', 'programme', 'intake', 'student_email', 'programme_type',
+                            'registration_number', 'sequence_number', 'student_number',
                             'generated_date', 'status', 'status_display', 'sent_date', 'recipient_email', 'sent_count']
 
     def get_student_name(self, obj):
@@ -87,6 +88,10 @@ class AdmissionLetterSerializer(serializers.ModelSerializer):
 
     def get_programme_type(self, obj):
         return obj.student.programme_type if obj.student else None
+
+    def create(self, validated_data):
+        validated_data['status'] = 'generated'
+        return super().create(validated_data)
 
 
 class NotificationSerializer(serializers.ModelSerializer):

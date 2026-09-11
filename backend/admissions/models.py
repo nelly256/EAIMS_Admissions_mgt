@@ -60,6 +60,7 @@ class AdmissionLetter(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='admission_letters')
     registration_number = models.CharField(max_length=100, unique=True)
     sequence_number = models.PositiveIntegerField()
+    student_number = models.CharField(max_length=20, blank=True, default='')
     generated_date = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='not_generated')
     sent_date = models.DateTimeField(null=True, blank=True)

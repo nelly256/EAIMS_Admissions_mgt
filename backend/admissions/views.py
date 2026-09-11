@@ -151,6 +151,17 @@ class AdmissionLetterViewSet(viewsets.ModelViewSet):
     serializer_class = AdmissionLetterSerializer
     permission_classes = [IsAuthenticated]
 
+    INTAKE_CODE_MAP = {
+        'MARCH': '03',
+        'AUGUST': '08',
+    }
+
+    def _compute_student_number(self, intake):
+        year_code = str(intake.academic_year)[-2:]
+        intake_code = self.INTAKE_CODE_MAP.get(intake.intake_name.upper(), '00')
+        count = AdmissionLetter.objects.filter(student__intake=intake).count()
+        return f"{year_code}{intake_code}{str(count).zfill(3)}"
+
     def _generate_letter_pdf(self, letter):
         """Generate PDF for an admission letter matching the EAIMS template specification."""
         from reportlab.lib.pagesizes import A4
@@ -185,7 +196,7 @@ class AdmissionLetterViewSet(viewsets.ModelViewSet):
             fontName='Times-Bold',
             fontSize=14,
             leading=17,
-            alignment=TA_LEFT,
+            alignment=TA_CENTER,
             textColor=rl_colors.black,
             spaceAfter=2,
         )
@@ -196,7 +207,7 @@ class AdmissionLetterViewSet(viewsets.ModelViewSet):
             fontName='Times-Bold',
             fontSize=11,
             leading=14,
-            alignment=TA_LEFT,
+            alignment=TA_CENTER,
             textColor=rl_colors.black,
             spaceAfter=4,
         )
@@ -317,14 +328,14 @@ class AdmissionLetterViewSet(viewsets.ModelViewSet):
         for logo_path in logo_paths:
             if os.path.exists(logo_path):
                 try:
-                    logo_image = Image(logo_path, width=50, height=50)
+                    logo_image = Image(logo_path, width=85, height=85)
                     break
                 except Exception:
                     continue
 
         # Fallback to abstract logo if image not found
         if logo_image is None:
-            logo_drawing = Drawing(40, 40)
+            logo_drawing = Drawing(75, 75)
             colors_list = [
                 rl_colors.HexColor('#FFD700'),  # yellow
                 rl_colors.HexColor('#228B22'),  # green
@@ -334,7 +345,7 @@ class AdmissionLetterViewSet(viewsets.ModelViewSet):
             for i, color in enumerate(colors_list):
                 row = i // 2
                 col = i % 2
-                rect = Rect(col * 20, row * 20, 20, 20)
+                rect = Rect(col * 37, row * 37, 37, 37)
                 rect.fillColor = color
                 rect.strokeColor = rl_colors.white
                 rect.strokeWidth = 1
@@ -357,13 +368,13 @@ class AdmissionLetterViewSet(viewsets.ModelViewSet):
             Paragraph('CENTRE No. UVT 645', header_info_style),
         ]
 
-        # Create header table: logo (left) + text (right)
-        logo_width = 55 if logo_image else 45
+        logo_width = 90 if logo_image else 75
         header_table = Table(
             [[logo_element, header_text]],
             colWidths=[logo_width, A4[0] - 4*cm - logo_width],
         )
         header_table.setStyle(TableStyle([
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
             ('VALIGN', (0, 0), (-1, -1), 'TOP'),
             ('LEFTPADDING', (0, 0), (-1, -1), 0),
             ('RIGHTPADDING', (0, 0), (-1, -1), 0),
@@ -373,34 +384,32 @@ class AdmissionLetterViewSet(viewsets.ModelViewSet):
         elements.append(header_table)
         elements.append(Spacer(1, 6))
 
-        # Multicolored divider
-        class DividerTable(Table):
-            def __init__(self):
-                # Create a drawing with 5 colored horizontal bars
-                drawing = Drawing(A4[0] - 4*cm, 6)
-                bar_width = (A4[0] - 4*cm) / 5
-                divider_colors = [
-                    rl_colors.HexColor('#FFD700'),  # yellow
-                    rl_colors.HexColor('#228B22'),  # green
-                    rl_colors.HexColor('#1E3A8A'),  # blue
-                    rl_colors.HexColor('#CC0000'),  # red
-                    rl_colors.HexColor('#FFFFFF'),  # white
-                ]
-                for i, color in enumerate(divider_colors):
-                    rect = Rect(i * bar_width, 0, bar_width, 6)
-                    rect.fillColor = color
-                    rect.strokeColor = rl_colors.white
-                    rect.strokeWidth = 0
-                    drawing.add(rect)
-                super().__init__([[drawing]], colWidths=[A4[0] - 4*cm])
-                self.setStyle(TableStyle([
-                    ('LEFTPADDING', (0, 0), (-1, -1), 0),
-                    ('RIGHTPADDING', (0, 0), (-1, -1), 0),
-                    ('TOPPADDING', (0, 0), (-1, -1), 0),
-                    ('BOTTOMPADDING', (0, 0), (-1, -1), 0),
-                ]))
-
-        elements.append(DividerTable())
+        # Thin separator lines
+        line_height = 2
+        gap = 2
+        total_height = line_height * 3 + gap * 2
+        divider_drawing = Drawing(A4[0] - 4*cm, total_height)
+        y = total_height - line_height
+        divider_colors = [
+            rl_colors.HexColor('#228B22'),
+            rl_colors.HexColor('#FFD700'),
+            rl_colors.HexColor('#1E3A8A'),
+        ]
+        for color in divider_colors:
+            rect = Rect(0, y, A4[0] - 4*cm, line_height)
+            rect.fillColor = color
+            rect.strokeColor = rl_colors.white
+            rect.strokeWidth = 0
+            divider_drawing.add(rect)
+            y -= (line_height + gap)
+        divider_table = Table([[divider_drawing]], colWidths=[A4[0] - 4*cm])
+        divider_table.setStyle(TableStyle([
+            ('LEFTPADDING', (0, 0), (-1, -1), 0),
+            ('RIGHTPADDING', (0, 0), (-1, -1), 0),
+            ('TOPPADDING', (0, 0), (-1, -1), 0),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 0),
+        ]))
+        elements.append(divider_table)
         elements.append(Spacer(1, 16))
 
         # ========== TITLE ==========
@@ -411,16 +420,15 @@ class AdmissionLetterViewSet(viewsets.ModelViewSet):
         # Prepare student details
         student_name = letter.student.full_name
         reg_number = letter.registration_number
-        # Use sequence number as application/receipt number
-        app_number = f"APP-{letter.sequence_number:06d}"
+        student_number = letter.student_number or '—'
 
         details_data = [
             [Paragraph('STUDENT\'S NAME:', student_label_style),
-             Paragraph(f'<u>{student_name}</u>', student_value_style)],
+             Paragraph(student_name, student_value_style)],
             [Paragraph('REGISTRATION NUMBER:', student_label_style),
-             Paragraph(f'<u>{reg_number}</u>', student_value_style)],
-            [Paragraph('APPLICATION/RECEIPT NUMBER:', student_label_style),
-             Paragraph(f'<u>{app_number}</u>', student_value_style)],
+             Paragraph(reg_number, student_value_style)],
+            [Paragraph('STUDENT NUMBER:', student_label_style),
+             Paragraph(student_number, student_value_style)],
         ]
 
         details_table = Table(details_data, colWidths=[6*cm, A4[0] - 4*cm - 6*cm])
@@ -517,30 +525,35 @@ class AdmissionLetterViewSet(viewsets.ModelViewSet):
         except Student.DoesNotExist:
             return Response({'error': 'Student not found'}, status=status.HTTP_404_NOT_FOUND)
 
+        intake = student.intake
+        course = student.course
+
         # Check if letter already exists for this student
         existing_letter = AdmissionLetter.objects.filter(student=student).first()
         if existing_letter:
+            if not existing_letter.student_number:
+                existing_letter.student_number = self._compute_student_number(intake)
+                existing_letter.save()
             existing_letter.status = 'generated'
             existing_letter.save()
             serializer = self.get_serializer(existing_letter)
             return Response(serializer.data, status=status.HTTP_200_OK)
 
-        course = student.course
-        intake = student.intake
-        sequence = AdmissionLetter.objects.filter(
+        sequence = request.data.get('sequence_number') or AdmissionLetter.objects.filter(
             student__course=course
         ).count() + 1
 
         intake_code = ''.join(
             c[0].upper() for c in intake.intake_name.split() if c
         )[:3].ljust(3, 'X')
-        reg_number = f'{intake.academic_year}-{intake_code}-{str(sequence).zfill(4)}'
+        reg_number = request.data.get('registration_number') or f'{intake.academic_year}-{intake_code}-{str(sequence).zfill(4)}'
 
         letter = AdmissionLetter.objects.create(
             student=student,
             registration_number=reg_number,
             sequence_number=sequence,
             status='generated',
+            student_number=self._compute_student_number(intake),
         )
         serializer = self.get_serializer(letter)
         return Response(serializer.data, status=status.HTTP_201_CREATED)

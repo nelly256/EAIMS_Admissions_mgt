@@ -637,8 +637,8 @@ function renderLetterPreview(letter) {
     const duration = isDiploma ? 'two-year' : 'one-year';
     const startDate = letter.generated_date ? formatDate(letter.generated_date) : '—';
 
-    // Application/receipt number
-    const appNumber = `APP-${String(seqNumber).padStart(6, '0')}`;
+    // Student number
+    const studentNumber = letter.student_number || '—';
 
     const html = `
     <!DOCTYPE html>
@@ -658,21 +658,21 @@ function renderLetterPreview(letter) {
             /* Header */
             .header-table { width: 100%; border-collapse: collapse; margin-bottom: 6px; }
             .header-table td { vertical-align: top; padding: 0; }
-            .logo-cell { width: 55px; }
-            .logo-img { width: 50px; height: 50px; object-fit: contain; }
+            .logo-cell { width: 90px; }
+            .logo-img { width: 85px; height: 85px; object-fit: contain; }
             .logo-fallback { 
-                width: 40px; height: 40px; 
+                width: 75px; height: 75px; 
                 background: linear-gradient(45deg, #FFD700 0%, #FFD700 50%, #228B22 50%, #228B22 100%);
                 display: flex;
             }
             .logo-fallback::after {
                 content: '';
                 position: absolute;
-                width: 40px; height: 40px;
+                width: 75px; height: 75px;
                 background: linear-gradient(45deg, #1E3A8A 0%, #1E3A8A 50%, #CC0000 50%, #CC0000 100%);
-                top: 20px; left: 20px;
+                top: 37px; left: 37px;
             }
-            .text-cell { padding-left: 10px; }
+            .text-cell { text-align: center; }
             .inst-name { 
                 font-family: 'Times New Roman', Times, serif; 
                 font-weight: bold; 
@@ -695,21 +695,15 @@ function renderLetterPreview(letter) {
                 color: #333; 
                 margin: 1px 0;
             }
-            /* Multicolored divider */
-            .divider { 
-                height: 6px; 
-                margin: 16px 0; 
-                display: flex; 
+            /* Thin separator lines */
+            .separator-line {
+                border: none;
+                height: 2px;
+                margin: 2px 0;
             }
-            .divider span { 
-                flex: 1; 
-                height: 6px; 
-            }
-            .divider .yellow { background: #FFD700; }
-            .divider .green { background: #228B22; }
-            .divider .blue { background: #1E3A8A; }
-            .divider .red { background: #CC0000; }
-            .divider .white { background: #FFFFFF; border: 1px solid #ddd; }
+            .separator-line.green { background: #228B22; }
+            .separator-line.yellow { background: #FFD700; }
+            .separator-line.blue { background: #1E3A8A; }
             /* Title */
             .letter-title { 
                 font-family: 'Times New Roman', Times, serif; 
@@ -734,7 +728,6 @@ function renderLetterPreview(letter) {
                 font-family: 'Times New Roman', Times, serif; 
                 font-size: 11pt; 
                 line-height: 15pt; 
-                text-decoration: underline; 
             }
             /* Body text */
             .body-text { 
@@ -792,14 +785,9 @@ function renderLetterPreview(letter) {
             </tr>
         </table>
 
-        <!-- Multicolored Divider -->
-        <div class="divider">
-            <span class="yellow"></span>
-            <span class="green"></span>
-            <span class="blue"></span>
-            <span class="red"></span>
-            <span class="white"></span>
-        </div>
+        <hr class="separator-line green">
+        <hr class="separator-line yellow">
+        <hr class="separator-line blue">
 
         <!-- Title -->
         <div class="letter-title">ADMISSION LETTER</div>
@@ -815,8 +803,8 @@ function renderLetterPreview(letter) {
                 <td class="value">${regNumber}</td>
             </tr>
             <tr>
-                <td class="label">APPLICATION/RECEIPT NUMBER:</td>
-                <td class="value">${appNumber}</td>
+                <td class="label">STUDENT NUMBER:</td>
+                <td class="value">${studentNumber}</td>
             </tr>
         </table>
 
