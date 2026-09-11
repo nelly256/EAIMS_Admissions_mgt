@@ -60,16 +60,17 @@ class AdmissionLetterSerializer(serializers.ModelSerializer):
     programme = serializers.SerializerMethodField()
     intake = serializers.SerializerMethodField()
     student_email = serializers.SerializerMethodField()
+    programme_type = serializers.SerializerMethodField()
     status_display = serializers.CharField(source='get_status_display', read_only=True)
 
     class Meta:
         model = AdmissionLetter
         fields = [
-            'id', 'student', 'student_name', 'programme', 'intake', 'student_email',
+            'id', 'student', 'student_name', 'programme', 'intake', 'student_email', 'programme_type',
             'registration_number', 'sequence_number', 'generated_date',
             'status', 'status_display', 'sent_date', 'recipient_email', 'sent_count',
         ]
-        read_only_fields = ['id', 'student_name', 'programme', 'intake', 'student_email',
+        read_only_fields = ['id', 'student_name', 'programme', 'intake', 'student_email', 'programme_type',
                             'generated_date', 'status', 'status_display', 'sent_date', 'recipient_email', 'sent_count']
 
     def get_student_name(self, obj):
@@ -84,10 +85,8 @@ class AdmissionLetterSerializer(serializers.ModelSerializer):
     def get_student_email(self, obj):
         return obj.student.email if obj.student else None
 
-    def validate_student(self, student):
-        if AdmissionLetter.objects.filter(student=student).exists():
-            raise serializers.ValidationError('This student already has an admission letter.')
-        return student
+    def get_programme_type(self, obj):
+        return obj.student.programme_type if obj.student else None
 
 
 class NotificationSerializer(serializers.ModelSerializer):

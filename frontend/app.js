@@ -578,9 +578,8 @@ function renderStudents() {
 function renderLetters() {
     elements.letterTable.innerHTML = state.admissionLetters
         .map((letter, index) => {
-            const student = state.students.find((item) => item.id === letter.student);
-            const programme = student && student.course ? student.course.course_name : '—';
-            const intake = student && student.intake ? `${student.intake.intake_name} ${student.intake.academic_year}` : '—';
+            const programme = letter.programme || '—';
+            const intake = letter.intake || '—';
             const statusClass = `status-badge ${letter.status || 'not_generated'}`;
             const statusText = letter.status_display || letter.status || 'Not Generated';
             const canView = letter.status !== 'not_generated';
@@ -589,7 +588,7 @@ function renderLetters() {
             return `
             <tr>
                 <td>${index + 1}</td>
-                <td>${student ? student.full_name : 'Unknown'}</td>
+                <td>${letter.student_name || 'Unknown'}</td>
                 <td>${letter.registration_number}</td>
                 <td>${programme}</td>
                 <td>${intake}</td>
@@ -633,8 +632,7 @@ function renderLetterPreview(letter) {
     const studentEmail = letter.student_email || '';
 
     // Determine qualification and duration based on programme type
-    const student = state.students.find(s => s.id === letter.student);
-    const isDiploma = student && student.programme_type === 'Diploma';
+    const isDiploma = letter.programme_type === 'Diploma';
     const qualification = isDiploma ? 'Diploma' : 'Certificate';
     const duration = isDiploma ? 'two-year' : 'one-year';
     const startDate = letter.generated_date ? formatDate(letter.generated_date) : '—';
@@ -1434,26 +1432,17 @@ async function handleLetterSubmit(event) {
     event.preventDefault();
     const form = event.target;
     const studentId = getSelectedStudentId();
-    const registrationNumber = form.registration_number.value.trim();
-    const sequenceNumber = Number(form.sequence_number.value);
 
     if (!studentId) {
         showAlert('Please choose a student.');
         return;
     }
 
-    if (!sequenceNumber || !registrationNumber) {
-        showAlert('Could not generate a sequence number or registration number for the selected student.');
-        return;
-    }
-
     try {
-        await apiFetch('/letters/', {
+        await apiFetch('/letters/generate/', {
             method: 'POST',
             body: JSON.stringify({
-                student: studentId,
-                registration_number: registrationNumber,
-                sequence_number: sequenceNumber,
+                student_id: studentId,
             }),
         });
         form.reset();
