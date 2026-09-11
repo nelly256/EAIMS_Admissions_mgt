@@ -89,6 +89,10 @@ class AdmissionLetterSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError('This student already has an admission letter.')
         return student
 
+    def create(self, validated_data):
+        validated_data['status'] = 'generated'
+        return super().create(validated_data)
+
 
 class NotificationSerializer(serializers.ModelSerializer):
     student_name = serializers.SerializerMethodField()

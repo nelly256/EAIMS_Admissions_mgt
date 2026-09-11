@@ -527,14 +527,14 @@ class AdmissionLetterViewSet(viewsets.ModelViewSet):
 
         course = student.course
         intake = student.intake
-        sequence = AdmissionLetter.objects.filter(
+        sequence = request.data.get('sequence_number') or AdmissionLetter.objects.filter(
             student__course=course
         ).count() + 1
 
         intake_code = ''.join(
             c[0].upper() for c in intake.intake_name.split() if c
         )[:3].ljust(3, 'X')
-        reg_number = f'{intake.academic_year}-{intake_code}-{str(sequence).zfill(4)}'
+        reg_number = request.data.get('registration_number') or f'{intake.academic_year}-{intake_code}-{str(sequence).zfill(4)}'
 
         letter = AdmissionLetter.objects.create(
             student=student,

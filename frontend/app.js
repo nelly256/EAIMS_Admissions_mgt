@@ -1448,10 +1448,10 @@ async function handleLetterSubmit(event) {
     }
 
     try {
-        await apiFetch('/letters/', {
+        await apiFetch('/letters/generate/', {
             method: 'POST',
             body: JSON.stringify({
-                student: studentId,
+                student_id: studentId,
                 registration_number: registrationNumber,
                 sequence_number: sequenceNumber,
             }),
