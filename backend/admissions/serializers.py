@@ -66,10 +66,11 @@ class AdmissionLetterSerializer(serializers.ModelSerializer):
         model = AdmissionLetter
         fields = [
             'id', 'student', 'student_name', 'programme', 'intake', 'student_email',
-            'registration_number', 'sequence_number', 'generated_date',
-            'status', 'status_display', 'sent_date', 'recipient_email', 'sent_count',
+            'registration_number', 'sequence_number', 'student_number',
+            'generated_date', 'status', 'status_display', 'sent_date', 'recipient_email', 'sent_count',
         ]
         read_only_fields = ['id', 'student_name', 'programme', 'intake', 'student_email',
+                            'registration_number', 'sequence_number', 'student_number',
                             'generated_date', 'status', 'status_display', 'sent_date', 'recipient_email', 'sent_count']
 
     def get_student_name(self, obj):
